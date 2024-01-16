@@ -1,0 +1,307 @@
+DROP TABLE STRANG.LOV CASCADE CONSTRAINTS;
+
+CREATE TABLE STRANG.LOV
+(
+  LOV_NAME       VARCHAR2(100 BYTE),
+  CODE           VARCHAR2(100 BYTE),
+  DESCRIPTION    VARCHAR2(1000 BYTE),
+  COLA           VARCHAR2(1000 BYTE),
+  COLB           VARCHAR2(1000 BYTE),
+  COLC           VARCHAR2(1000 BYTE),
+  PRIMARY_ROWID  ROWID,
+  SITE_OWNER     VARCHAR2(100 BYTE),
+  DATE_MODIFIED  DATE,
+  COLD           VARCHAR2(1000 BYTE),
+  COLE           VARCHAR2(1000 BYTE),
+  COLF           VARCHAR2(1000 BYTE),
+  COLG           VARCHAR2(1000 BYTE),
+  COLH           VARCHAR2(1000 BYTE),
+  COLI           VARCHAR2(1000 BYTE),
+  COLJ           VARCHAR2(1000 BYTE)
+)
+TABLESPACE PICTION_MED_1
+PCTUSED    0
+PCTFREE    10
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          9856K
+            NEXT             32K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      KEEP
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE
+ENABLE ROW MOVEMENT;
+
+
+CREATE INDEX STRANG.I_LOV_1 ON STRANG.LOV
+(LOV_NAME, CODE, COLA)
+LOGGING
+TABLESPACE PICTION_MED_1
+PCTFREE    0
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          11008K
+            NEXT             256K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      KEEP
+           );
+
+CREATE INDEX STRANG.I_LOV_2 ON STRANG.LOV
+(COLA, LOV_NAME, CODE)
+LOGGING
+TABLESPACE PICTION_MED_1
+PCTFREE    0
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          8960K
+            NEXT             256K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      KEEP
+           );
+
+CREATE OR REPLACE TRIGGER STRANG.T_LOV 
+ after insert or update or delete
+ ON STRANG.LOV
+ for each row
+DISABLE
+declare
+
+ mod_type	varchar2(20);
+ rid		rowid;
+ pk1		varchar2(4000);
+ pk2		varchar2(4000);
+
+begin
+
+ if nvl(global_site.disable_trigger,FALSE) then return; end if;
+ if inserting
+  then
+   mod_type := 'I';
+   rid := :NEW.ROWID;
+   pk1 := :NEW.lov_name;
+   pk2 := :NEW.code;
+ elsif updating
+  then
+   mod_type := 'U';
+   rid := :OLD.ROWID;
+   pk1 := :NEW.lov_name;
+   pk2 := :NEW.code;
+ else
+   if :old.lov_name = 'CONTROLS' then return; end if;
+   if global_site.get_name is null then global_site.set_name; end if;
+   mod_type := 'D';
+   rid := :OLD.ROWID;
+   pk1 := :OLD.lov_name;
+   pk2 := :OLD.code;
+   insert into replication(replication_id,site,table_name,column_name,row_changed,date_changed,change_type,old_value,new_value,pk_col1,pk_col2) values
+    (s_replication.nextval,nvl(global_site.site_name,'PRIMARY'),'LOV','SITE_OWNER',rid,sysdate,mod_type,:OLD.SITE_OWNER,:NEW.SITE_OWNER,pk1,pk2);
+   return;
+ end if;
+
+ -- Check if LOV NAME is CONTROL
+ -- If so do not replicate
+ if :NEW.lov_name = 'CONTROLS' then return; end if;
+
+ if global_site.get_name is null then global_site.set_name; end if;
+ if not((:OLD.lov_name = :NEW.lov_name) and (:OLD.lov_name is not null and :NEW.lov_name is not null)) and not (:OLD.lov_name is null and :NEW.lov_name is null)
+  then
+   insert into replication(replication_id,site,table_name,column_name,row_changed,date_changed,change_type,old_value,new_value,pk_col1,pk_col2) values
+    (s_replication.nextval,nvl(global_site.site_name,'PRIMARY'),'LOV','LOV_NAME',rid,sysdate,mod_type,:OLD.lov_name,:NEW.lov_name,:OLD.lov_name,:OLD.CODE);
+ end if;
+
+ if not((:OLD.CODE = :NEW.CODE) and (:OLD.CODE is not null and :NEW.CODE is not null)) and not (:OLD.CODE is null and :NEW.CODE is null)
+  then
+   insert into replication(replication_id,site,table_name,column_name,row_changed,date_changed,change_type,old_value,new_value,pk_col1,pk_col2) values
+    (s_replication.nextval,nvl(global_site.site_name,'PRIMARY'),'LOV','CODE',rid,sysdate,mod_type,:OLD.CODE,:NEW.CODE,:OLD.lov_name,:OLD.CODE);
+ end if;
+
+ if not((:OLD.DESCRIPTION = :NEW.DESCRIPTION) and (:OLD.DESCRIPTION is not null and :NEW.DESCRIPTION is not null))  and not (:OLD.DESCRIPTION is null and :NEW.DESCRIPTION is null)
+  then
+   insert into replication(replication_id,site,table_name,column_name,row_changed,date_changed,change_type,old_value,new_value,pk_col1,pk_col2) values
+    (s_replication.nextval,nvl(global_site.site_name,'PRIMARY'),'LOV','DESCRIPTION',rid,sysdate,mod_type,:OLD.DESCRIPTION,:NEW.DESCRIPTION,pk1,pk2);
+ end if;
+
+ if not((:OLD.COLA = :NEW.COLA) and (:OLD.COLA is not null and :NEW.COLA is not null)) and not (:OLD.COLA is null and :NEW.COLA is null)
+  then
+   insert into replication(replication_id,site,table_name,column_name,row_changed,date_changed,change_type,old_value,new_value,pk_col1,pk_col2) values
+    (s_replication.nextval,nvl(global_site.site_name,'PRIMARY'),'LOV','COLA',rid,sysdate,mod_type,:OLD.COLA,:NEW.COLA,pk1,pk2);
+ end if;
+
+ if not((:OLD.COLB = :NEW.COLB) and (:OLD.COLB is not null and :NEW.COLB is not null)) and not (:OLD.COLB is null and :NEW.COLB is null)
+  then
+   insert into replication(replication_id,site,table_name,column_name,row_changed,date_changed,change_type,old_value,new_value,pk_col1,pk_col2) values
+    (s_replication.nextval,nvl(global_site.site_name,'PRIMARY'),'LOV','COLB',rid,sysdate,mod_type,:OLD.COLB,:NEW.COLB,pk1,pk2);
+ end if;
+
+ if not((:OLD.COLC = :NEW.COLC) and (:OLD.COLC is not null and :NEW.COLC is not null)) and not (:OLD.COLC is null and :NEW.COLC is null)
+  then
+   insert into replication(replication_id,site,table_name,column_name,row_changed,date_changed,change_type,old_value,new_value,pk_col1,pk_col2) values
+    (s_replication.nextval,nvl(global_site.site_name,'PRIMARY'),'LOV','COLC',rid,sysdate,mod_type,:OLD.COLC,:NEW.COLC,pk1,pk2);
+ end if;
+
+ if not((:OLD.SITE_OWNER = :NEW.SITE_OWNER) and (:OLD.SITE_OWNER is not null and :NEW.SITE_OWNER is not null)) and not (:OLD.SITE_OWNER is null and :NEW.SITE_OWNER is null)
+  then
+   insert into replication(replication_id,site,table_name,column_name,row_changed,date_changed,change_type,old_value,new_value,pk_col1,pk_col2) values
+    (s_replication.nextval,nvl(global_site.site_name,'PRIMARY'),'LOV','SITE_OWNER',rid,sysdate,mod_type,:OLD.SITE_OWNER,:NEW.SITE_OWNER,pk1,pk2);
+ end if;
+
+
+end t_lov;
+/
+
+
+CREATE OR REPLACE TRIGGER STRANG.T_LOV_1 
+ before insert or update
+ ON STRANG.LOV
+ for each row
+declare
+ cursor c1(lname varchar2, lcode varchar2, lcola varchar2) is select 'x' exst from lov where lov_name = lname and code = upper(lcode) and cola = upper(lcola);
+ cursor c2(lname varchar2, lcode varchar2) is select 'x' exst from lov where lov_name = lname and code = upper(lcode);
+ cursor c3(lname varchar2, lcode varchar2, f_date varchar2, t_date varchar2) is
+  select *
+  from   lov
+  where  lov_name = lname
+         and code = upper(lcode)
+         and ( ( to_date(f_date) >= to_date(cola) and to_date(f_date) <= to_date(colb))
+              or
+               (to_date(t_date) >= to_date(cola) and to_date(t_date) <= to_date(colb))
+             )
+  ;
+
+ c1rec        c1%ROWTYPE;
+ c2rec        c2%ROWTYPE;
+ c3rec        c3%ROWTYPE;
+ v_date1      varchar2(100);
+ v_date2      varchar2(100);
+begin
+ if :NEW.lov_name = 'CONTROLS' and :NEW.cola is null
+  then
+    raise_application_error(-20101,'State must have a value');
+ end if;
+ if :NEW.lov_name = 'UNRATTAB' and :NEW.cola is null
+  then
+    raise_application_error(-20101,'Start date must have a value');
+ end if;
+ if :NEW.lov_name = 'UNRATTAB' and :NEW.colb is null
+  then
+    raise_application_error(-20101,'End date must have a value');
+ end if;
+ if inserting
+  then
+   if :NEW.lov_name = 'CONTROLS'
+    then
+     open c1('CONTROLS',:NEW.code,:NEW.cola);
+     fetch c1 into c1rec;
+     if c1%FOUND
+      then
+       close c1;
+       raise_application_error(-20102,'Control Value Already Exists');
+     end if;
+     close c1;
+   elsif :NEW.lov_name = 'UNRATTAB'
+    then
+     -- Check date syntax
+     v_date1 := websys.glbx.guess_date(:NEW.cola);
+     if v_date1 is null
+      then
+       raise_application_error(-20102,'"FROM" date is invalid: ' || :NEW.cola);
+     end if;
+     v_date2 := websys.glbx.guess_date(:NEW.colb);
+     if v_date1 is null
+      then
+       raise_application_error(-20102,'"TO" date is invalid: ' || :NEW.colb);
+     end if;
+     -- Check if dates overlap for same code
+     open c3('UNRATTAB',:NEW.code, v_date1, v_date2);
+     fetch c3 into c3rec;
+     if c3%FOUND
+      then
+       close c3;
+       raise_application_error(-20102,'Dates conflict with [' || c3rec.code || ']: ' || c3rec.cola || ' - ' || c3rec.colb);
+     end if;
+     close c3;
+    else
+     open c2(:NEW.lov_name,:NEW.code);
+     fetch c2 into c2rec;
+     if c2%FOUND
+      then
+       close c2;
+       raise_application_error(-20103,'Lov Already Exists');
+     end if;
+     close c2;
+   end if;
+/*
+ elsif updating
+  then
+   if nvl(:NEW.code,'!') <> nvl(:OLD.code,'\')
+    then
+     if :NEW.lov_name = 'CONTROLS'
+      then
+       open c1('CONTROLS',:NEW.code,:NEW.cola);
+       fetch c1 into c1rec;
+       if c1%FOUND
+        then
+         close c1;
+         raise_application_error(-20104,'Control Value Already Exists');
+       end if;
+       close c1;
+      else
+       open c2(:NEW.lov_name,:NEW.code);
+       fetch c2 into c2rec;
+       if c2%FOUND
+        then
+         close c2;
+         raise_application_error(-20105,'Lov Value Already Exists');
+       end if;
+       close c2;
+     end if;
+   end if;
+ */
+ end if;
+
+end;
+/
+
+
+CREATE OR REPLACE TRIGGER STRANG.T_LOV_B 
+ before insert or update
+ ON STRANG.LOV
+ for each row
+DISABLE
+declare
+
+begin
+
+ if nvl(global_site.disable_trigger,FALSE) then return; end if;
+ if global_site.disable_trigger is NULL or :NEW.date_modified is NULL
+  then
+   :NEW.date_modified := sysdate;
+ end if;
+ if global_site.get_name is null then global_site.set_name; end if;
+ if :NEW.site_owner is not null then return; end if;
+ if inserting
+  then
+   :NEW.site_owner := global_site.site_name;
+ elsif updating
+  then
+   :NEW.site_owner := global_site.site_name;
+ end if;
+
+end t_lov_b;
+/
+
+
+GRANT DELETE, INSERT, SELECT, UPDATE ON STRANG.LOV TO STX1;
+
+GRANT ALTER, DELETE, INDEX, INSERT, REFERENCES, SELECT, UPDATE, ON COMMIT REFRESH, QUERY REWRITE, DEBUG, FLASHBACK ON STRANG.LOV TO WEBSYS;
