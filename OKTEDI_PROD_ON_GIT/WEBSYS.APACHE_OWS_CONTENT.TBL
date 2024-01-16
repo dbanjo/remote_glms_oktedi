@@ -1,0 +1,67 @@
+DROP TABLE WEBSYS.APACHE_OWS_CONTENT CASCADE CONSTRAINTS;
+
+CREATE TABLE WEBSYS.APACHE_OWS_CONTENT
+(
+  NAME          VARCHAR2(256 BYTE)              NOT NULL,
+  MIME_TYPE     VARCHAR2(128 BYTE),
+  DOC_SIZE      NUMBER,
+  DAD_CHARSET   VARCHAR2(128 BYTE),
+  LAST_UPDATED  DATE,
+  CONTENT_TYPE  VARCHAR2(128 BYTE),
+  LENGTH        NUMBER,
+  OID           NUMBER,
+  BLOB_CONTENT  BLOB
+)
+LOB (BLOB_CONTENT) STORE AS BASICFILE L_BLOB_APACHE (
+  TABLESPACE  PICTION_MED_1
+  DISABLE     STORAGE IN ROW
+  CHUNK       16384
+  PCTVERSION  10
+  NOCACHE
+  LOGGING
+      STORAGE    (
+                  INITIAL          10M
+                  NEXT             512K
+                  MINEXTENTS       1
+                  MAXEXTENTS       UNLIMITED
+                  PCTINCREASE      0
+                  BUFFER_POOL      DEFAULT
+                 ))
+TABLESPACE PICTION_MED_1
+PCTUSED    0
+PCTFREE    0
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          512K
+            NEXT             512K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE;
+
+
+ALTER TABLE WEBSYS.APACHE_OWS_CONTENT ADD (
+  UNIQUE (NAME)
+  USING INDEX
+    TABLESPACE PICTION_MED_1
+    PCTFREE    10
+    INITRANS   2
+    MAXTRANS   255
+    STORAGE    (
+                INITIAL          512K
+                NEXT             512K
+                MINEXTENTS       1
+                MAXEXTENTS       UNLIMITED
+                PCTINCREASE      0
+                BUFFER_POOL      DEFAULT
+               )
+  ENABLE VALIDATE);
+
+
+--  There is no statement for index WEBSYS.SYS_C007236.
+--  The object is created when the parent object is created.
