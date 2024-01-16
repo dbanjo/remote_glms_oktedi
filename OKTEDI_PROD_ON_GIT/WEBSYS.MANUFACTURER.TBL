@@ -1,0 +1,56 @@
+DROP TABLE WEBSYS.MANUFACTURER CASCADE CONSTRAINTS;
+
+CREATE TABLE WEBSYS.MANUFACTURER
+(
+  MANUFACTURER_ID                NUMBER(16),
+  MAN_TYPE                       VARCHAR2(20 BYTE),
+  PHG_ACCT_LEN                   NUMBER(16)     DEFAULT 4,
+  PASSWORD_EXPIRES               DATE,
+  NAME                           VARCHAR2(100 BYTE),
+  CONTACT                        VARCHAR2(100 BYTE),
+  ABN_NUMBER                     VARCHAR2(100 BYTE),
+  USERNAME                       VARCHAR2(100 BYTE),
+  PASSWORD                       VARCHAR2(100 BYTE),
+  FORUM_PRIV                     VARCHAR2(40 BYTE) DEFAULT 'READ ONLY',
+  L_FORUM_STYLE                  VARCHAR2(40 BYTE) DEFAULT 'HIERARCHY',
+  FAILED_LOGINS                  NUMBER(16),
+  CONTACT_EMAIL                  VARCHAR2(100 BYTE),
+  INVOICE_DAYS                   NUMBER(16),
+  IS_BETA_TESTER                 CHAR(1 BYTE)   DEFAULT 'F',
+  THEME_NAME                     VARCHAR2(100 BYTE),
+  DATE_CREATED                   DATE,
+  PRICE_BOOK_PUBLIC              CHAR(1 BYTE)   DEFAULT 'T',
+  PUBLIC_BOOK                    VARCHAR2(100 BYTE) DEFAULT 'REPRINT',
+  MAN_BF                         CHAR(100 BYTE),
+  ALL_PHOTOGRAPHERS              CHAR(1 BYTE)   DEFAULT 'T',
+  LIMIT_LAF                      CHAR(1 BYTE)   DEFAULT 'T',
+  HOME_PAGE                      VARCHAR2(1000 BYTE),
+  LOAD_DIRECTORY                 VARCHAR2(1000 BYTE),
+  WORKFLOW_DISPLAY               CHAR(1 BYTE)   DEFAULT 'P',
+  FUND_CENTRE                    VARCHAR2(100 BYTE),
+  STD_SCHOOLBOOKING_LAF          VARCHAR2(100 BYTE),
+  STD_SCHOOLBOOKING_BF           VARCHAR2(100 BYTE),
+  SORT_ON_ATTRIBUTE_ID           NUMBER(16),
+  MANUFACTURER_TITLE             VARCHAR2(100 BYTE) DEFAULT 'Manufacturer',
+  RECEPTIONIST_AID               NUMBER(16),
+  REPORTING_CATEGORY             VARCHAR2(100 BYTE),
+  STD_SCHOOLBOOKING_PROFILE_AID  NUMBER(16),
+  STD_SCHOOLBOOKING_PROFILE_PID  NUMBER(16),
+  BARCODE_FUNCTION               VARCHAR2(1000 BYTE)
+)
+TABLESPACE PICTION_MED_1
+PCTUSED    0
+PCTFREE    0
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          32K
+            NEXT             512K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE;
