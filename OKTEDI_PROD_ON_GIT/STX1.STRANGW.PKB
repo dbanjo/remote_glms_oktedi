@@ -1,5 +1,5 @@
 CREATE OR REPLACE package body STX1.strangw
-as -- version 1.0
+as -- version 1.0 -- new change DB
  /*
  History:
  1.0.0 Beta Dev (MK)
