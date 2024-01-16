@@ -1,0 +1,169 @@
+DROP TABLE WEBSYS.HEALTH_PARAMETERS CASCADE CONSTRAINTS;
+
+CREATE TABLE WEBSYS.HEALTH_PARAMETERS
+(
+  PARAMETER_CODE      CHAR(4 BYTE),
+  VERSION_NUMBER      NUMBER(38)                DEFAULT 1,
+  LANGUAGE            VARCHAR2(20 BYTE)         DEFAULT 'ENGLISH',
+  DATABASE_VENDOR     VARCHAR2(20 BYTE)         DEFAULT 'ORACLE',
+  GROUP_TOPIC         VARCHAR2(40 BYTE)         DEFAULT 'Environment Details' NOT NULL,
+  DATABASE_TYPE       VARCHAR2(40 BYTE)         DEFAULT 'In House and 3rd Party' NOT NULL,
+  SECTION             VARCHAR2(40 BYTE)         DEFAULT 'Database Administration',
+  SHORT_DESCRIPTION   VARCHAR2(200 BYTE)        DEFAULT 'No description yet provided' NOT NULL,
+  RESPONSE_TYPE       VARCHAR2(10 BYTE)         DEFAULT 'TEXT',
+  MAX_SCORE           NUMBER(38),
+  PROCEDURE_CALL      VARCHAR2(4000 BYTE),
+  EXPECTED_RESPONSE   VARCHAR2(40 BYTE),
+  HYPERTEXT_LINK      VARCHAR2(200 BYTE),
+  HELP_DESCRIPTION    VARCHAR2(4000 BYTE),
+  HOW_TO_FIND_ANSWER  VARCHAR2(4000 BYTE),
+  DATE_CREATED        DATE                      DEFAULT SYSDATE,
+  DATE_UPDATED        DATE
+)
+TABLESPACE PICTION_MED_1
+PCTUSED    0
+PCTFREE    0
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          128K
+            NEXT             32K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE;
+
+COMMENT ON TABLE WEBSYS.HEALTH_PARAMETERS IS 'This table contains all the available health check questions.';
+
+COMMENT ON COLUMN WEBSYS.HEALTH_PARAMETERS.PARAMETER_CODE IS 'A four character code used to identify a health parameter.';
+
+COMMENT ON COLUMN WEBSYS.HEALTH_PARAMETERS.VERSION_NUMBER IS 'To keep track of changes made to questions is this version number';
+
+COMMENT ON COLUMN WEBSYS.HEALTH_PARAMETERS.LANGUAGE IS 'What speaking language is the question?';
+
+COMMENT ON COLUMN WEBSYS.HEALTH_PARAMETERS.DATABASE_VENDOR IS 'Which database vendor is this question for?';
+
+COMMENT ON COLUMN WEBSYS.HEALTH_PARAMETERS.GROUP_TOPIC IS 'The group that this health check parameter belongs to';
+
+COMMENT ON COLUMN WEBSYS.HEALTH_PARAMETERS.DATABASE_TYPE IS 'The question relates to an in-house application, 3rd party application or both';
+
+COMMENT ON COLUMN WEBSYS.HEALTH_PARAMETERS.SECTION IS 'The section within the organisation that is responsible for answering the question';
+
+COMMENT ON COLUMN WEBSYS.HEALTH_PARAMETERS.SHORT_DESCRIPTION IS 'A short description of this parameter';
+
+COMMENT ON COLUMN WEBSYS.HEALTH_PARAMETERS.RESPONSE_TYPE IS 'Is this parameter a number, fuzzy boolean, score or text?';
+
+COMMENT ON COLUMN WEBSYS.HEALTH_PARAMETERS.MAX_SCORE IS 'The maximum score allowable for this question';
+
+COMMENT ON COLUMN WEBSYS.HEALTH_PARAMETERS.PROCEDURE_CALL IS 'To extract the value for the health, this procedure can be used';
+
+COMMENT ON COLUMN WEBSYS.HEALTH_PARAMETERS.EXPECTED_RESPONSE IS 'What answer Yes/No or NULL is the expected response to this health checkpoint';
+
+COMMENT ON COLUMN WEBSYS.HEALTH_PARAMETERS.HYPERTEXT_LINK IS 'A link pointing to a reference point about this parameter';
+
+COMMENT ON COLUMN WEBSYS.HEALTH_PARAMETERS.HELP_DESCRIPTION IS 'Details about the question';
+
+COMMENT ON COLUMN WEBSYS.HEALTH_PARAMETERS.HOW_TO_FIND_ANSWER IS 'Details where to look to answer the question';
+
+COMMENT ON COLUMN WEBSYS.HEALTH_PARAMETERS.DATE_CREATED IS 'Date this parameter was first created';
+
+COMMENT ON COLUMN WEBSYS.HEALTH_PARAMETERS.DATE_UPDATED IS 'Date this parameter was last updated';
+
+
+ALTER TABLE WEBSYS.HEALTH_PARAMETERS ADD (
+  PRIMARY KEY
+  (PARAMETER_CODE)
+  USING INDEX
+    TABLESPACE PICTION_MED_1
+    PCTFREE    10
+    INITRANS   2
+    MAXTRANS   255
+    STORAGE    (
+                INITIAL          32K
+                NEXT             32K
+                MINEXTENTS       1
+                MAXEXTENTS       UNLIMITED
+                PCTINCREASE      0
+                BUFFER_POOL      DEFAULT
+               )
+  ENABLE VALIDATE);
+
+
+--  There is no statement for index WEBSYS.SYS_C007242.
+--  The object is created when the parent object is created.
+
+CREATE OR REPLACE TRIGGER WEBSYS.T_HEALTH_PARAMETERS_1 
+ BEFORE INSERT OR UPDATE
+ ON WEBSYS.HEALTH_PARAMETERS
+ FOR EACH ROW
+DECLARE
+ cursor c1( grp varchar2 ) is select 'x' from health_group where group_name = grp;
+ cursor c2( grp varchar2, grpid varchar2 ) is select 'x' from health_group where group_name = grp and code = grpid;
+ cursor c3( sct varchar2 ) is select 'x' from lov where lov_type = 'SECTION' and lov_value = sct;
+ cursor c4( rt varchar2 ) is select 'x' from lov where lov_type = 'RESPONSE TYPE' and lov_value = rt;
+ cursor c5( dt varchar2 ) is select 'x' from lov where lov_type = 'DATABASE TYPE' and lov_value = dt;
+ tmp char(1);
+ dmy integer;
+
+BEGIN
+  tmp := NULL;
+  open c1( :NEW.GROUP_TOPIC );
+  fetch c1 into tmp;
+  close c1;
+  if tmp is null
+   then raise_application_error( -20101,'Group: ' || :NEW.GROUP_TOPIC || ' does not exist' );
+  end if;
+
+  tmp := NULL;
+  open c2( :NEW.GROUP_TOPIC, substr(:NEW.PARAMETER_CODE,1,2));
+  fetch c2 into tmp;
+  close c2;
+  if tmp is null
+   then
+    raise_application_error( -20102,'Parameter Code: ' || :NEW.GROUP_TOPIC || '. First two characters are not a valid code. See table LOV.' );
+  end if;
+
+  begin
+   dmy := to_number(substr(:NEW.PARAMETER_CODE,3,2));
+  exception
+   when others then
+    raise_application_error( -20103,'Parameter Code: ' || :NEW.PARAMETER_CODE || '. The last two values are not a valid number.' );
+  end;
+
+  tmp := NULL;
+  open c3( :NEW.SECTION );
+  fetch c3 into tmp;
+  close c3;
+  if tmp is null
+   then
+    raise_application_error( -21004,'Section: ' || :NEW.SECTION || ' does not exist' );
+  end if;
+  tmp := NULL;
+  open c4( :NEW.RESPONSE_TYPE );
+  fetch c4 into tmp;
+  close c4;
+  if tmp is null
+   then
+    raise_application_error( -20105,'Response Type: ' || :NEW.RESPONSE_TYPE || ' does not exist' );
+  end if;
+
+  tmp := NULL;
+  open c5( :NEW.DATABASE_TYPE );
+  fetch c5 into tmp;
+  close c5;
+  if tmp is null
+   then
+    raise_application_error( -20106,'Database Type: ' || :NEW.DATABASE_TYPE || ' does not exist' );
+  end if;
+
+  if updating
+   then
+    :new.version_number := :old.version_number + 1;
+    :new.date_updated := sysdate;
+  end if;
+END T_HEALTH_PARAMETERS_1;
+/
