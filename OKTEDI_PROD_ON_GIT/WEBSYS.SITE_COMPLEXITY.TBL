@@ -1,0 +1,66 @@
+DROP TABLE WEBSYS.SITE_COMPLEXITY CASCADE CONSTRAINTS;
+
+CREATE TABLE WEBSYS.SITE_COMPLEXITY
+(
+  VARIATION       VARCHAR2(20 BYTE),
+  PARAMETER_CODE  CHAR(4 BYTE),
+  VALUE           VARCHAR2(100 BYTE)            DEFAULT 0,
+  WEIGHTING       NUMBER,
+  LOG_BASE        NUMBER
+)
+TABLESPACE PICTION_MED_1
+PCTUSED    0
+PCTFREE    0
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          32K
+            NEXT             32K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE;
+
+COMMENT ON TABLE WEBSYS.SITE_COMPLEXITY IS 'This table is used to determine how complex a site is.';
+
+COMMENT ON COLUMN WEBSYS.SITE_COMPLEXITY.VARIATION IS 'Over time, multiple ways for calculating the complexity of a site will be proposed. This field allows thos variations to be stored in the one table.';
+
+COMMENT ON COLUMN WEBSYS.SITE_COMPLEXITY.PARAMETER_CODE IS 'The unique code of the Health Parameter.';
+
+COMMENT ON COLUMN WEBSYS.SITE_COMPLEXITY.VALUE IS 'If the inputted value equals this value, use the weighting as a score. Used to score text responses.';
+
+COMMENT ON COLUMN WEBSYS.SITE_COMPLEXITY.WEIGHTING IS 'A value used to adjust the value to allow all values to relate to each other.';
+
+COMMENT ON COLUMN WEBSYS.SITE_COMPLEXITY.LOG_BASE IS 'If not zero, use the log function at this base to convert the score.';
+
+
+ALTER TABLE WEBSYS.SITE_COMPLEXITY ADD (
+  PRIMARY KEY
+  (VARIATION, PARAMETER_CODE, VALUE, WEIGHTING, LOG_BASE)
+  USING INDEX
+    TABLESPACE PICTION_MED_1
+    PCTFREE    10
+    INITRANS   2
+    MAXTRANS   255
+    STORAGE    (
+                INITIAL          32K
+                NEXT             32K
+                MINEXTENTS       1
+                MAXEXTENTS       UNLIMITED
+                PCTINCREASE      0
+                BUFFER_POOL      DEFAULT
+               )
+  ENABLE VALIDATE);
+
+
+--  There is no statement for index WEBSYS.SYS_C007245.
+--  The object is created when the parent object is created.
+
+ALTER TABLE WEBSYS.SITE_COMPLEXITY ADD (
+  FOREIGN KEY (PARAMETER_CODE) 
+  REFERENCES WEBSYS.HEALTH_PARAMETERS (PARAMETER_CODE)
+  ENABLE VALIDATE);
