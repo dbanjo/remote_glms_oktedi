@@ -1,0 +1,17 @@
+DROP INDEX WEBSYS.I_ODM_LOG_1;
+
+CREATE INDEX WEBSYS.I_ODM_LOG_1 ON WEBSYS.ODM_LOG
+(ID, DATE_CREATED)
+LOGGING
+TABLESPACE PICTION_MED_1
+PCTFREE    0
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          256K
+            NEXT             512K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           );
