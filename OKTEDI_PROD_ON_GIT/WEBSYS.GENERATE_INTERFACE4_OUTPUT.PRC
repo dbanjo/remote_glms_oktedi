@@ -1,5 +1,7 @@
 CREATE OR REPLACE procedure WEBSYS.generate_interface4_output( surl in varchar2, vtoday in date, is_batch in varchar2 default 'FALSE' )
 as
+
+
  cursor c1 is
  select ir.po as "Purchase Order"
       , ir.po_item_no as "PO Item No"
