@@ -1,0 +1,43 @@
+DROP TABLE WEBSYS.ADVANCED_SEARCH CASCADE CONSTRAINTS;
+
+CREATE TABLE WEBSYS.ADVANCED_SEARCH
+(
+  PID              NUMBER(16),
+  AID              NUMBER(16),
+  ORDER_BY         NUMBER(16),
+  LOGIN_TYPE       VARCHAR2(20 BYTE)            DEFAULT 'PHOTOGRAPHER',
+  UMO_SCENE_ID     NUMBER(16),
+  CUST_ID          NUMBER(16),
+  SESSID           NUMBER(16),
+  SRC_NAME         VARCHAR2(100 BYTE),
+  KEYWORD          VARCHAR2(100 BYTE),
+  JOIN_CLAUSE      VARCHAR2(20 BYTE),
+  CLAUSE           VARCHAR2(20 BYTE),
+  IS_GLOBAL        CHAR(1 BYTE)                 DEFAULT 'F',
+  STEM             CHAR(1 BYTE)                 DEFAULT 'F',
+  IGNORE_LIGHTBOX  CHAR(1 BYTE)                 DEFAULT 'T',
+  ADJACENT_TERM    CHAR(1 BYTE)                 DEFAULT 'F',
+  NOTIFY_ON_NEW    CHAR(1 BYTE)                 DEFAULT 'F',
+  ROWS_RETURNED    NUMBER(16),
+  DATE_UPDATED     DATE,
+  AGE              VARCHAR2(100 BYTE),
+  UMO_SCENE_IDS    VARCHAR2(1000 BYTE),
+  SORT_ON          CHAR(10 BYTE)                DEFAULT 'NSI',
+  PHOTO_DIMENSION  CHAR(1 BYTE)                 DEFAULT 'A'
+)
+TABLESPACE PICTION_MED_1
+PCTUSED    0
+PCTFREE    0
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          32K
+            NEXT             512K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE;
