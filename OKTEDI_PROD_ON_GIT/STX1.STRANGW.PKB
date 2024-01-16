@@ -3334,7 +3334,7 @@ procedure process_cargo( x in owa.vc_arr, y in owa.vc_arr )
      end case;
     end loop;
     delete from strang.po_pool where PO_NUMBER = lrec.PO_NUMBER and PO_ITEM = lrec.PO_ITEM;
-    -- How do we handle deletions from lookup table.  The interface1 pushes through deleted po records and these are shown when delete_ind is set to �L�
+    -- How do we handle deletions from lookup table.  The interface1 pushes through deleted po records and these are shown when delete_ind is set to ?L?
     if nvl(lrec.DELETE_IND,'|') = 'L'
      then
       null;
@@ -3527,7 +3527,7 @@ c. populate lov table
 MATERIAL=000000000010000127 - exist in lov lov_name = inventory (if not exist should)
 MATL_GROUP=colb
 
-It inserts the following into lov where lov_name=�INVENT�, if there is no record where po_pool.material = lov.code.
+It inserts the following into lov where lov_name=?INVENT?, if there is no record where po_pool.material = lov.code.
 
 MATERIAL lov.code where lov_name='INVENT' Material Number CHAR 18
 SHORT_TEXT lov.description where lov_name='INVENT' and code = po_pool.material Short Text CHAR 40
@@ -8365,14 +8365,17 @@ Please vary Delivery no and recno as well as supplier invoice number in you samp
  
  
    cursor c1 is 
-    select distinct m.* , d.hawb_hawbno, d.hawb_hawbno_2 ,
-          p.po, p.po_item_no, p.grn, p.grn_item ,
-          s.shipname, s.voy, s.estarrive,
-          p.deliveryno, p.recno,
+    select distinct m.* , d.hawb_hawbno, d.hawb_hawbno_2,
+          p.po, p.po_item_no, p.grn, p.grn_item,
+          s.shipname, 
+          s.voy, 
+          case when m.ship_id = 1 then null else s.estarrive end as estarrive,
+          p.deliveryno, 
+          p.recno,
           strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION', m.complete) packing_status,
          (select s2.shipname from strang.ships_airway s2 where s2.ship_id = m.local_ship_id) shipname_local, 
 		 (select s2.voy from strang.ships_airway s2 where s2.ship_id = m.local_ship_id) voy_local, 
-		 (select s2.estarrive from strang.ships_airway s2 where s2.ship_id = m.local_ship_id) local_estarrive,
+		 (select case when s2.ship_id = 2 then null else s2.estarrive end from strang.ships_airway s2 where s2.ship_id = m.local_ship_id) local_estarrive,
 		 (select s3.convoyname from strang.convoy s3 where s3.convoy_id = m.convoy_id) convoy_name,
 		 (select s3.convoy_type from strang.convoy s3 where s3.convoy_id  = m.convoy_id) convoy_voy,
 		 (select s3.estdepart from strang.convoy s3 where s3.convoy_id  = m.convoy_id ) convoy_estarrive 
@@ -8395,7 +8398,6 @@ Please vary Delivery no and recno as well as supplier invoice number in you samp
 	                  and p.po >= i.po )
 	     order by p.po, p.deliveryno, p.recno;
 
-
   cursor c2 is
    select distinct m.*,
           d.hawb_hawbno,
@@ -8404,13 +8406,16 @@ Please vary Delivery no and recno as well as supplier invoice number in you samp
           p.po_item_no,
           p.grn,
           p.grn_item,
-          s.shipname, s.voy, s.estarrive,
+          s.shipname, 
+          s.voy, 
+          case when m.ship_id = 1 then null else s.estarrive end as estarrive,
+        --  s.estarrive,
           p.deliveryno,
           p.recno,
           strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION', m.complete) packing_status,
           (select s2.shipname from strang.ships_airway s2 where s2.ship_id = m.local_ship_id) shipname_local,
 		  (select s2.voy from strang.ships_airway s2 where s2.ship_id = m.local_ship_id) voy_local,
-		  (select s2.estarrive from strang.ships_airway s2 where s2.ship_id = m.local_ship_id) local_estarrive,
+		  (select case when s2.ship_id = 2 then null else s2.estarrive end from strang.ships_airway s2 where s2.ship_id = m.local_ship_id) local_estarrive,
           (select s3.convoyname from strang.convoy s3 where s3.convoy_id = m.convoy_id) convoy_name,
 		  (select s3.convoy_type from strang.convoy s3 where s3.convoy_id  = m.convoy_id) convoy_voy,
 		  (select s3.estdepart from strang.convoy s3 where s3.convoy_id  = m.convoy_id ) convoy_estarrive
