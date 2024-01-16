@@ -1,0 +1,34 @@
+DROP TABLE WEBSYS.ADVERT_CHARGE_PLAN CASCADE CONSTRAINTS;
+
+CREATE TABLE WEBSYS.ADVERT_CHARGE_PLAN
+(
+  CHID            NUMBER(10),
+  CHARGE_NAME     VARCHAR2(100 BYTE),
+  CHARGED_AMOUNT  NUMBER,
+  FREQUENCY       NUMBER(10),
+  TARGET_THEME    VARCHAR2(100 BYTE),
+  DAYS_VALID_FOR  NUMBER(10),
+  TARGET_PHG      CHAR(1 BYTE)                  DEFAULT 'T',
+  TARGET_CPL      CHAR(1 BYTE)                  DEFAULT 'T',
+  TARGET_GST      CHAR(1 BYTE)                  DEFAULT 'T',
+  PAGE_LOC_A      CHAR(1 BYTE)                  DEFAULT 'T',
+  PAGE_LOC_B      CHAR(1 BYTE)                  DEFAULT 'T',
+  PAGE_LOC_C      CHAR(1 BYTE)                  DEFAULT 'T',
+  PAGE_LOC_D      CHAR(1 BYTE)                  DEFAULT 'T'
+)
+TABLESPACE PICTION_MED_1
+PCTUSED    0
+PCTFREE    0
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          32K
+            NEXT             512K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE;
