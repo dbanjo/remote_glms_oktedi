@@ -1,0 +1,91 @@
+DROP TABLE STX1.CSV_LOAD CASCADE CONSTRAINTS;
+
+CREATE TABLE STX1.CSV_LOAD
+(
+  LOAD_ID       NUMBER(16),
+  COL_ID        NUMBER(16),
+  ROW_ID        NUMBER(16),
+  LANGUAGE_VAL  VARCHAR2(20 BYTE),
+  VALUE         VARCHAR2(4000 BYTE),
+  VALUE2        VARCHAR2(4000 BYTE),
+  VALUE_LARGE   CLOB
+)
+LOB (VALUE_LARGE) STORE AS SECUREFILE L_VALUE_LARGE (
+  TABLESPACE  PICTION_MED_1
+  ENABLE      STORAGE IN ROW
+  CHUNK       16384
+  CACHE
+  LOGGING
+      STORAGE    (
+                  INITIAL          10M
+                  NEXT             10M
+                  MINEXTENTS       1
+                  MAXEXTENTS       UNLIMITED
+                  PCTINCREASE      0
+                  BUFFER_POOL      DEFAULT
+                 ))
+TABLESPACE PICTION_MED_1
+PCTUSED    0
+PCTFREE    0
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          512K
+            NEXT             512K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      RECYCLE
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE;
+
+
+CREATE INDEX STX1.I_CSV_LOAD_1 ON STX1.CSV_LOAD
+(LOAD_ID, COL_ID, ROW_ID)
+LOGGING
+TABLESPACE PICTION_MED_1
+PCTFREE    0
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          512K
+            NEXT             512K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      RECYCLE
+           );
+
+CREATE INDEX STX1.I_CSV_LOAD_2 ON STX1.CSV_LOAD
+(ROW_ID, LOAD_ID, COL_ID)
+LOGGING
+TABLESPACE PICTION_MED_1
+PCTFREE    0
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          512K
+            NEXT             512K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      RECYCLE
+           );
+
+CREATE INDEX STX1.I_CSV_LOAD_3 ON STX1.CSV_LOAD
+(VALUE, LOAD_ID, ROW_ID)
+LOGGING
+TABLESPACE PICTION_MED_1
+PCTFREE    0
+INITRANS   2
+MAXTRANS   165
+STORAGE    (
+            INITIAL          512K
+            NEXT             512K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      RECYCLE
+           );
