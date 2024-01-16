@@ -1,5 +1,5 @@
 CREATE OR REPLACE package body STX1.strangw
-as -- version 1.0
+as -- version 1.0  -- added by DB
  /*
  History:
  1.0.0 Beta Dev (MK)
@@ -3334,7 +3334,7 @@ procedure process_cargo( x in owa.vc_arr, y in owa.vc_arr )
      end case;
     end loop;
     delete from strang.po_pool where PO_NUMBER = lrec.PO_NUMBER and PO_ITEM = lrec.PO_ITEM;
-    -- How do we handle deletions from lookup table.  The interface1 pushes through deleted po records and these are shown when delete_ind is set to ‘L’
+    -- How do we handle deletions from lookup table.  The interface1 pushes through deleted po records and these are shown when delete_ind is set to ï¿½Lï¿½
     if nvl(lrec.DELETE_IND,'|') = 'L'
      then
       null;
@@ -3527,7 +3527,7 @@ c. populate lov table
 MATERIAL=000000000010000127 - exist in lov lov_name = inventory (if not exist should)
 MATL_GROUP=colb
 
-It inserts the following into lov where lov_name=’INVENT’, if there is no record where po_pool.material = lov.code.
+It inserts the following into lov where lov_name=ï¿½INVENTï¿½, if there is no record where po_pool.material = lov.code.
 
 MATERIAL lov.code where lov_name='INVENT' Material Number CHAR 18
 SHORT_TEXT lov.description where lov_name='INVENT' and code = po_pool.material Short Text CHAR 40
