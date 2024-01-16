@@ -1,0 +1,43 @@
+DROP TABLE STX1.CSV_LOAD_TMP CASCADE CONSTRAINTS;
+
+CREATE TABLE STX1.CSV_LOAD_TMP
+(
+  LOAD_ID       NUMBER(16),
+  COL_ID        NUMBER(16),
+  ROW_ID        NUMBER(16),
+  LANGUAGE_VAL  VARCHAR2(20 BYTE),
+  VALUE         VARCHAR2(4000 BYTE),
+  VALUE2        VARCHAR2(4000 BYTE),
+  VALUE_LARGE   CLOB
+)
+LOB (VALUE_LARGE) STORE AS BASICFILE (
+  TABLESPACE  PICTION_MED_1
+  ENABLE      STORAGE IN ROW
+  CHUNK       8192
+  RETENTION
+  NOCACHE
+  LOGGING
+      STORAGE    (
+                  INITIAL          512K
+                  NEXT             512K
+                  MINEXTENTS       1
+                  MAXEXTENTS       UNLIMITED
+                  PCTINCREASE      0
+                  BUFFER_POOL      DEFAULT
+                 ))
+TABLESPACE PICTION_MED_1
+PCTUSED    0
+PCTFREE    10
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          512K
+            NEXT             512K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE;
