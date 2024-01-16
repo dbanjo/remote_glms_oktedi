@@ -1,0 +1,38 @@
+DROP TABLE WEBSYS.UMO_TEMPLOAD CASCADE CONSTRAINTS;
+
+CREATE TABLE WEBSYS.UMO_TEMPLOAD
+(
+  UMO_ID     NUMBER(16),
+  LOAD_DATA  BLOB
+)
+LOB (LOAD_DATA) STORE AS BASICFILE (
+  TABLESPACE  PICTION_MED_1
+  ENABLE      STORAGE IN ROW
+  CHUNK       16384
+  PCTVERSION  10
+  NOCACHE
+  LOGGING
+      STORAGE    (
+                  INITIAL          1M
+                  NEXT             512K
+                  MINEXTENTS       1
+                  MAXEXTENTS       UNLIMITED
+                  PCTINCREASE      0
+                  BUFFER_POOL      DEFAULT
+                 ))
+TABLESPACE PICTION_MED_1
+PCTUSED    0
+PCTFREE    0
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          5M
+            NEXT             512K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE;
