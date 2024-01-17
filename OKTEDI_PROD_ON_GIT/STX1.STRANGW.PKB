@@ -1,6 +1,6 @@
 CREATE OR REPLACE package body STX1.strangw
-as -- version 1.0  -- added by DB
- /*
+as -- version 1.0  -- added by DBanjo
+ /*   
  History:
  1.0.0 Beta Dev (MK)
  1.0.1 Beta Dev (MK) - added interface1, interface2 and interface 3 coding
@@ -10,7 +10,6 @@ as -- version 1.0  -- added by DB
  version		constant	  varchar2(20) := '1.0.0E';
  err_found	    			  boolean;
  g_request				      varchar2(100);
- g_test                       varchar2(50);
  g_name					      varchar2(100) := 'STRANG_POSPUSH_';
  g_digest_un				  varchar2(100) := 'GLMS_SERVICE';
  g_digest_pw				  varchar2(100) := 'Eo^d3LFj';
