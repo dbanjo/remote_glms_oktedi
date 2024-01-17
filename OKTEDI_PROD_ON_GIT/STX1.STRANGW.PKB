@@ -1,11 +1,12 @@
 CREATE OR REPLACE package body STX1.strangw
-as -- version 1.0  -- added by DB
+as -- version 1.0  -- added by DB -- remote
  /*
  History:
  1.0.0 Beta Dev (MK)
  1.0.1 Beta Dev (MK) - added interface1, interface2 and interface 3 coding
  1.0.3 Changed update interface2 to reference recno. (Jul 2018)
  */
+
 
  version		constant	  varchar2(20) := '1.0.0E';
  err_found	    			  boolean;
