@@ -35,7 +35,7 @@ as
       , ir.convoy_estdepart as "Convoy Depart Date"
       , ir.hawb_hawbno as "Hawb Intl"
       , ir.hawb_hawbno_2 as "Hawb Local"
-      , ir.post_date as "Post Date"
+      , to_Char(ir.post_date,'DD/MM/YY HH24:MI:SS') as "Post Date"
  from websys.interface4_records ir
 where trunc(post_date) = trunc(sysdate - 1)  
 order by 1, 3, 4, 6;
