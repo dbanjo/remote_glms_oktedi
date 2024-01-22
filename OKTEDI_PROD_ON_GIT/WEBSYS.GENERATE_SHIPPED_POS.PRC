@@ -137,7 +137,7 @@ nvl(m.complete,'S') NOT IN ('H','J') and
 m.io='I' and 
 m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'KIUNGA') and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
---r.currdate >  sysdate - 720 and 
+r.currdate >  sysdate - 720 and 
 c.customer_type = 'SUPPLIER' and 
  exists (select 1
              from  strang.detailrs dr2
@@ -211,7 +211,7 @@ m.current_location in (select code from strang.lov where lov_name='LOCATIONS' an
 --dr.DELIVERYNO between 9000000 and 9999999 ) and
 --p.grn_status in (1,8,9) and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
---r.currdate >  sysdate - 720 and 
+r.currdate >  sysdate - 720 and 
 c.customer_type = 'SUPPLIER' and 
  exists (select 1
              from  strang.detailrs dr2
@@ -285,7 +285,7 @@ m.current_location in (select code from strang.lov where lov_name='LOCATIONS' an
 --dr.DELIVERYNO between 9000000 and 9999999 ) and
 --p.grn_status in (1,8,9) and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
---r.currdate >  sysdate - 720 and 
+r.currdate >  sysdate - 720 and 
 c.customer_type = 'SUPPLIER' and 
  exists (select 1
              from  strang.detailrs dr2
@@ -360,7 +360,7 @@ m.current_location in (select code from strang.lov where lov_name='LOCATIONS' an
 --dr.DELIVERYNO between 9000000 and 9999999 ) and
 --p.grn_status in (1,8,9) and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
---r.currdate >  sysdate - 700 and 
+r.currdate >  sysdate - 700 and 
 c.customer_type = 'SUPPLIER' and 
  exists (select 1
              from  strang.detailrs dr2
@@ -504,7 +504,7 @@ c.customer_type = 'SUPPLIER' and
         m.io='I' and 
         m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'TABUBIL') and 
         nvl(r.supplier_customer_id,0) = c.customer_id and 
-        --r.currdate >  sysdate - 720 and 
+        r.currdate >  sysdate - 720 and 
         c.customer_type = 'SUPPLIER' and 
         exists (select 1
                   from strang.detailrs dr2
@@ -575,7 +575,7 @@ nvl(m.complete,'S') NOT IN ('H','J') and
 m.io='I' and 
 m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'KIUNGA') and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
---r.currdate >  sysdate - 720 and 
+r.currdate >  sysdate - 720 and 
 c.customer_type = 'SUPPLIER' and 
  exists (select 1
              from  strang.detailrs dr2
@@ -649,7 +649,7 @@ m.current_location in (select code from strang.lov where lov_name='LOCATIONS' an
 --dr.DELIVERYNO between 9000000 and 9999999 ) and
 --p.grn_status in (1,8,9) and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
---r.currdate >  sysdate - 720 and 
+r.currdate >  sysdate - 720 and 
 c.customer_type = 'SUPPLIER' and 
  exists (select 1
              from  strang.detailrs dr2
@@ -723,7 +723,7 @@ m.current_location in (select code from strang.lov where lov_name='LOCATIONS' an
 --dr.DELIVERYNO between 9000000 and 9999999 ) and
 --p.grn_status in (1,8,9) and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
---r.currdate >  sysdate - 720 and 
+r.currdate >  sysdate - 720 and 
 c.customer_type = 'SUPPLIER' and 
  exists (select 1
              from  strang.detailrs dr2
@@ -798,7 +798,7 @@ m.current_location in (select code from strang.lov where lov_name='LOCATIONS' an
 --dr.DELIVERYNO between 9000000 and 9999999 ) and
 --p.grn_status in (1,8,9) and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
---r.currdate >  sysdate - 700 and 
+r.currdate >  sysdate - 700 and 
 c.customer_type = 'SUPPLIER' and 
  exists (select 1
              from  strang.detailrs dr2
