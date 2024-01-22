@@ -700,7 +700,7 @@ select
        , nvl(strang.f_getLovColumn( 'UNCTNTAB', 'COLA', m.iso_container_type),m.iso_container_type) as "ISO Container Type"
        , m.owner  "Container Owner"
        , decode(m.iso_container_type,null,'BBULK','FCL') "Cargo"
-       , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') as "Description"
+       , replace(strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION'),'"','') as "Description"
        , round((nvl(m.vgm,(nvl(m.sumweight,0)+nvl(m.tare,0)))/1000),3) as "Gross Weight in Tonne"
        , nvl(m.sumvolume,0) as "Cargo Volume"
        , m.consignee||' '||strang.f_getlocdesc(m.consignee_location)||' '||strang.f_getlocdesc(m.warehouse_destination)||' '||m.warehouse_destination as "Consignee"
