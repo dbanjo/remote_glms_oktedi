@@ -55,13 +55,14 @@ as
   where p.deliveryno = dr.deliveryno and 
         p.deliveryno = r.deliveryno and 
         r.currdate >  sysdate - 700 and 
-        substr(p.po,1,2) in ('47','43','45') and
+     --   substr(p.po,1,2) in ('47','43','45') and
         r.cust_customer_id = 1 and 
         dr.io = 'I' and 
         dr.movement_no = m.movement_no and
         nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
-        nvl(m.complete,'S') NOT IN ('H','J','D') and
-        nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
+        nvl(m.complete,'S') NOT IN ('H','J') and
+    --    nvl(m.complete,'S') NOT IN ('H','J','D') and
+       -- nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
         m.io='I' and 
         m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'TABUBIL') and 
         nvl(r.supplier_customer_id,0) = c.customer_id and 
@@ -126,13 +127,13 @@ select
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
-substr(p.po,1,2) in ('47','43','45') and
+--substr(p.po,1,2) in ('47','43','45') and
 r.cust_customer_id = 1 and 
 dr.io = 'I' and 
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
 nvl(m.complete,'S') NOT IN ('H','J') and
-nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
+--nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
 m.io='I' and 
 m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'KIUNGA') and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
@@ -196,14 +197,14 @@ select
        , strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION',m.complete) as "packing Status" 
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
-substr(p.po,1,2) in ('47','43','45') and
+--substr(p.po,1,2) in ('47','43','45') and
 p.deliveryno = r.deliveryno and 
 r.cust_customer_id = 1 and 
 dr.io = 'I' and 
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
 nvl(m.complete,'S') NOT IN ('H','J') and
-nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
+--nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
 m.io='I' and 
 m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'MOTUKEA') and 
 --(dr.DELIVERYNO between 1000000 and 1999999 or
@@ -271,13 +272,13 @@ select
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
-substr(p.po,1,2) in ('47','43','45') and
+--substr(p.po,1,2) in ('47','43','45') and
 r.cust_customer_id = 1 and 
 dr.io = 'I' and 
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
 nvl(m.complete,'S') NOT IN ('H','J') and
-nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
+--nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
 m.io='I' and 
 m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'BRISBANE') and 
 --(dr.DELIVERYNO between 1000000 and 1999999 or
@@ -345,13 +346,13 @@ select
 from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
-substr(p.po,1,2) in ('47','43','45') and
+--substr(p.po,1,2) in ('47','43','45') and
 r.cust_customer_id = 1 and 
 dr.io = 'I' and 
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
 nvl(m.complete,'S') NOT IN ('H','J') and
-nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
+--nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
 m.io='I' and (
 m.current_location is null or
 m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc not in ( 'BRISBANE', 'MOTUKEA', 'KIUNGA','TABUBIL')) ) and 
@@ -359,7 +360,7 @@ m.current_location in (select code from strang.lov where lov_name='LOCATIONS' an
 --dr.DELIVERYNO between 9000000 and 9999999 ) and
 --p.grn_status in (1,8,9) and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
-r.currdate >  sysdate - 700 and 
+--r.currdate >  sysdate - 700 and 
 c.customer_type = 'SUPPLIER' and 
  exists (select 1
              from  strang.detailrs dr2
@@ -439,7 +440,7 @@ c.customer_type = 'SUPPLIER' and
  cursor c2 is
    select count('x') tot
    from
-   (    select p.deliveryno as "Delivery No"
+   (     select p.deliveryno as "Delivery No"
       ,  p.recno as "PO Rno"
       ,  p.po as "Purchase Order"
       ,  p.po_item_no as "PO Item No"
@@ -457,8 +458,8 @@ c.customer_type = 'SUPPLIER' and
       ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'URGENCY') as "Priority"
       ,  nvl(p.shipping_text,(decode(dr.sa,'S','Pack for Sea Freight','A','Pack for Air Freight'))) as "Mode"
       ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'MOVEMENT_NO') as "Container"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SEAL') as Seal
-      ,  nvl(to_char(dr.hawb_hawbno),' ') as HAWB 
+      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SEAL') as "Seal"
+      ,  nvl(to_char(dr.hawb_hawbno),' ') as "HAWB" 
       ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIP ID') as "Intl Ship ID"
       ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIPNAME') as "Intl Ship/MAWB"
       ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL VOYAGE') as "Intl Voyage"
@@ -492,13 +493,14 @@ c.customer_type = 'SUPPLIER' and
   where p.deliveryno = dr.deliveryno and 
         p.deliveryno = r.deliveryno and 
         r.currdate >  sysdate - 700 and 
-        substr(p.po,1,2) in ('47','43','45') and
+     --   substr(p.po,1,2) in ('47','43','45') and
         r.cust_customer_id = 1 and 
         dr.io = 'I' and 
         dr.movement_no = m.movement_no and
         nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
-        nvl(m.complete,'S') NOT IN ('H','J','D') and
-        nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
+        nvl(m.complete,'S') NOT IN ('H','J') and
+    --    nvl(m.complete,'S') NOT IN ('H','J','D') and
+       -- nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
         m.io='I' and 
         m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'TABUBIL') and 
         nvl(r.supplier_customer_id,0) = c.customer_id and 
@@ -563,13 +565,13 @@ select
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
-substr(p.po,1,2) in ('47','43','45') and
+--substr(p.po,1,2) in ('47','43','45') and
 r.cust_customer_id = 1 and 
 dr.io = 'I' and 
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
 nvl(m.complete,'S') NOT IN ('H','J') and
-nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
+--nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
 m.io='I' and 
 m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'KIUNGA') and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
@@ -633,14 +635,14 @@ select
        , strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION',m.complete) as "packing Status" 
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
-substr(p.po,1,2) in ('47','43','45') and
+--substr(p.po,1,2) in ('47','43','45') and
 p.deliveryno = r.deliveryno and 
 r.cust_customer_id = 1 and 
 dr.io = 'I' and 
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
 nvl(m.complete,'S') NOT IN ('H','J') and
-nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
+--nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
 m.io='I' and 
 m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'MOTUKEA') and 
 --(dr.DELIVERYNO between 1000000 and 1999999 or
@@ -708,13 +710,13 @@ select
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
-substr(p.po,1,2) in ('47','43','45') and
+--substr(p.po,1,2) in ('47','43','45') and
 r.cust_customer_id = 1 and 
 dr.io = 'I' and 
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
 nvl(m.complete,'S') NOT IN ('H','J') and
-nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
+--nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
 m.io='I' and 
 m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'BRISBANE') and 
 --(dr.DELIVERYNO between 1000000 and 1999999 or
@@ -782,13 +784,13 @@ select
 from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
-substr(p.po,1,2) in ('47','43','45') and
+--substr(p.po,1,2) in ('47','43','45') and
 r.cust_customer_id = 1 and 
 dr.io = 'I' and 
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
 nvl(m.complete,'S') NOT IN ('H','J') and
-nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
+--nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
 m.io='I' and (
 m.current_location is null or
 m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc not in ( 'BRISBANE', 'MOTUKEA', 'KIUNGA','TABUBIL')) ) and 
@@ -796,7 +798,7 @@ m.current_location in (select code from strang.lov where lov_name='LOCATIONS' an
 --dr.DELIVERYNO between 9000000 and 9999999 ) and
 --p.grn_status in (1,8,9) and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
-r.currdate >  sysdate - 700 and 
+--r.currdate >  sysdate - 700 and 
 c.customer_type = 'SUPPLIER' and 
  exists (select 1
              from  strang.detailrs dr2
