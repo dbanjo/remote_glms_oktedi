@@ -2,59 +2,46 @@ CREATE OR REPLACE procedure WEBSYS.generate_shipped_pos( surl in varchar2, vtoda
 as
 
  cursor c1 is
-  select p.deliveryno as "Delivery No"
-      ,  p.recno as "PO Rno"
-      ,  p.po as "Purchase Order"
-      ,  p.po_item_no as "PO Item No"
-      ,  p.inventoryno as "Material No"
-      ,  p.supinv as "Invoice"
-      ,  p.sap_delno_qty as "Quantity"
-      ,  p.sap_delno_unit as "Unit"
-      ,  p.grn as "GRN"
-      ,  p.off_site_receipt as "Receipted Date"
-      ,  c.customer as "Vendor"
-      ,  dr.logno as "Log No"
-      ,  dr.itemno as "Delivery Item"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'WAREHOUSE_DESTINATION') as "Warehouse Destination"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'CURRENT_LOCATION') as "Current Location"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'URGENCY') as "Priority"
-      ,  nvl(p.shipping_text,(decode(dr.sa,'S','Pack for Sea Freight','A','Pack for Air Freight'))) as "Mode"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'MOVEMENT_NO') as "Container"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SEAL') as "Seal"
-      ,  nvl(to_char(dr.hawb_hawbno),' ') as "HAWB" 
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIP ID') as "Intl Ship ID"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIPNAME') as "Intl Ship/MAWB"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL VOYAGE') as "Intl Voyage"
-      ,  case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'etd') else null end as "Intl ETD"
-      ,  case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'eta') else null end as "Intl ETA"
-      ,  case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'depart') else null end as "Intl Port of Loading"
-      ,  case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'arrive') else null end as "Intl Port of Discharge"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'BOL') as "Intl Bol"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'CUSTOMS_CLEARED_DATE') as "Customs Cleared Date"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIP ID') as "Local Ship ID"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIPNAME') as "Local Ship"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL VOYAGE') as "Local Voyage"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL BOL') as "Local Bol"
-      ,  strang.f_getshipfields_mv(m.movement_no,m.seal,'L','ESTDEPART') as "Local ETD" 
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL ESTARRIVE') as "Local ETA"
-      ,  strang.f_getlocdesc(strang.f_getshipfields_mv(m.movement_no,m.seal,'L','PORTLOAD')) as "Local Port of Loading"
-      ,  strang.f_getlocdesc(strang.f_getshipfields_mv(m.movement_no,m.seal,'L','PORTDISC')) as "Local Port of Discharge"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SCHEDULED CONVOY') as "Scheduled Convoy"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SCHEDULED CONVOY DATE') as "Scheduled Convoy Date"
-      ,  nvl(strang.f_getLovColumn( 'UNCTNTAB', 'COLA', m.iso_container_type),m.iso_container_type) as "ISO Container Type"
-      ,  m.owner  "Container Owner"
-      ,  decode(m.iso_container_type,null,'BBULK','FCL') "Cargo"
-      ,  strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') as "Description"
-      ,  round((nvl(m.vgm,(nvl(m.sumweight,0)+nvl(m.tare,0)))/1000),3) as "Gross Weight in Tonne"
-      ,  nvl(m.sumvolume,0) as "Cargo Volume"
-      ,  m.consignee||' '||strang.f_getlocdesc(m.consignee_location)||' '||strang.f_getlocdesc(m.warehouse_destination)||' '||m.warehouse_destination as "Consignee"
-      ,  strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'HAZARDOUS') as "Hazardous Codes"
-      ,  'TABUBIL' as "Controlling Office"
-      ,  strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION',m.complete) as "packing Status" 
-   from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
+  select p.po as "Purchase Order"
+       , p.po_item_no as "PO Item No"
+       , p.grn as "GRN"
+       , p.grn_item as "GRN Item"
+       , p.deliveryno as "Delivery No"
+       , p.recno as "PO Rno"
+       , strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION', m.complete) "Packing Status"
+       , m.urgency  as "Priority"
+       , m.movement_type as "Movement Type"
+       , m.movement_no as "Container"
+       , m.seal as "Seal"
+       , case when m.io = 'I' then 'INBOUND' else 'OUTBOUND' end as "Direction"
+       , m.full_mt as "Full Or Empty"
+-------------------------------------------------------------------------------------           
+       , m.consignee as "Consignee"
+       , strang.f_getlovColumn('LOCATIONS','DESCRIPTION', m.consignee_location) as "Consignee Location"
+       , m.warehouse_destination as "Warehouse Destination"
+       , strang.f_getlovColumn('LOCATIONS','DESCRIPTION', m.current_location)  as "Current Location"
+       , m.customs_cleared_date as "Customs Cleared Date"
+       , m.local_bol as "Local BOL"
+       , m.bol as "Intl BOL"
+ -------------------------------------------------------------------------------------        
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIPNAME') as "Intl Ship Name"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL VOYAGE')  as "Intl Voyage"
+       , case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'eta') else null end as "Intl Est Arrival Date"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIPNAME') as "Local Ship Name"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL VOYAGE') as "Local Voyage"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL ESTARRIVE') as "Local Est Arrival Date"
+       , (select s3.convoyname from strang.convoy s3 where s3.convoy_id = m.convoy_id) as "Convoy Name"
+       , (select s3.convoy_type from strang.convoy s3 where s3.convoy_id  = m.convoy_id) as "Convoy Type"
+	   , (select s3.estdepart from strang.convoy s3 where s3.convoy_id  = m.convoy_id ) as "Convoy Depart Date"
+ -------------------------------------------------------------------------------
+       , dr.hawb_hawbno as "Hawb Intl"
+       , dr.hawb_hawbno_2 as "Hawb Local"
+       , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
+   from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r
+      , strang.customers c
   where p.deliveryno = dr.deliveryno and 
         p.deliveryno = r.deliveryno and 
-        r.currdate >  sysdate - 700 and 
+        r.currdate >  sysdate - 720 and 
      --   substr(p.po,1,2) in ('47','43','45') and
         r.cust_customer_id = 1 and 
         dr.io = 'I' and 
@@ -66,64 +53,48 @@ as
         m.io='I' and 
         m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'TABUBIL') and 
         nvl(r.supplier_customer_id,0) = c.customer_id and 
-        --r.currdate >  sysdate - 720 and 
         c.customer_type = 'SUPPLIER' and 
         exists (select 1
                   from strang.detailrs dr2
                  where dr.movement_no is not null
                    and dr2.deliveryno = dr.deliveryno
                    and dr2.itemno  = dr.itemno)            
-union all
-select  
- p.deliveryno as "Delivery No"
-,p.recno as "PO Rno"
-,p.po as "Purchase Order"
-,p.po_item_no as "PO Item No"
-,p.inventoryno as "Material No"
-,p.supinv as "Invoice"
-,p.sap_delno_qty as "Quantity"
-,p.sap_delno_unit as "Unit"
-,p.grn as "GRN"
-,p.off_site_receipt as "Receipted Date"
-,c.customer as "Vendor"
-,dr.logno as "Log No"
-,dr.itemno as "Delivery Item"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'WAREHOUSE_DESTINATION') as "Warehouse Destination"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'CURRENT_LOCATION') as "Current Location"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'URGENCY') as "Priority"
-,nvl(p.shipping_text,(decode(dr.sa,'S','Pack for Sea Freight','A','Pack for Air Freight'))) as "Mode"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'MOVEMENT_NO') as "Container"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SEAL') as Seal
-,nvl(to_char(dr.hawb_hawbno),' ') as HAWB 
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIP ID') as "Intl Ship ID"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIPNAME') as "Intl Ship/MAWB"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL VOYAGE') as "Intl Voyage"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'etd') else null end as "Intl ETD"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'eta') else null end as "Intl ETA"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'depart') else null end as "Intl Port of Loading"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'arrive') else null end as "Intl Port of Discharge"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'BOL') as "Intl Bol"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'CUSTOMS_CLEARED_DATE') as "Customs Cleared Date"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIP ID') as "Local Ship ID"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIPNAME') as "Local Ship"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL VOYAGE') as "Local Voyage"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL BOL') as "Local Bol"
-, strang.f_getshipfields_mv(m.movement_no,m.seal,'L','ESTDEPART') as "Local ETD" 
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL ESTARRIVE') as "Local ETA"
-, strang.f_getlocdesc(strang.f_getshipfields_mv(m.movement_no,m.seal,'L','PORTLOAD')) as "Local Port of Loading"
-, strang.f_getlocdesc(strang.f_getshipfields_mv(m.movement_no,m.seal,'L','PORTDISC')) as "Local Port of Discharge"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SCHEDULED CONVOY') as "Scheduled Convoy"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SCHEDULED CONVOY DATE') as "Scheduled Convoy Date"
-       , nvl(strang.f_getLovColumn( 'UNCTNTAB', 'COLA', m.iso_container_type),m.iso_container_type) as "ISO Container Type"
-       , m.owner  "Container Owner"
-       , decode(m.iso_container_type,null,'BBULK','FCL') "Cargo"
-       , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') as "Description"
-       , round((nvl(m.vgm,(nvl(m.sumweight,0)+nvl(m.tare,0)))/1000),3) as "Gross Weight in Tonne"
-       , nvl(m.sumvolume,0) as "Cargo Volume"
-       , m.consignee||' '||strang.f_getlocdesc(m.consignee_location)||' '||strang.f_getlocdesc(m.warehouse_destination)||' '||m.warehouse_destination as "Consignee"
-       , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'HAZARDOUS') as "Hazardous Codes"
-       , 'KIUNGA' as "Controlling Office"
-       , strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION',m.complete) as "packing Status" 
+union all  -- 2 
+select p.po as "Purchase Order"
+       , p.po_item_no as "PO Item No"
+       , p.grn as "GRN"
+       , p.grn_item as "GRN Item"
+       , p.deliveryno as "Delivery No"
+       , p.recno as "PO Rno"
+       , strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION', m.complete) packing_status
+       , m.urgency  as "Priority"
+       , m.movement_type as "Movement Type"
+       , m.movement_no as "Container"
+       , m.seal as "Seal"
+       , case when m.io = 'I' then 'INBOUND' else 'OUTBOUND' end as "Direction"
+       , m.full_mt as "Full Or Empty"
+-------------------------------------------------------------------------------------           
+       , m.consignee as "Consignee"
+       , strang.f_getlovColumn('LOCATIONS','DESCRIPTION', m.consignee_location) as "Consignee Location"
+       , m.warehouse_destination as "Warehouse Destination"
+       , strang.f_getlovColumn('LOCATIONS','DESCRIPTION', m.current_location)  as "Current Location"
+       , m.customs_cleared_date as "Customs Cleared Date"
+       , m.local_bol as "Local BOL"
+       , m.bol as "Intl BOL"
+ -------------------------------------------------------------------------------------        
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIPNAME') as "Intl Ship Name"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL VOYAGE')  as "Intl Voyage"
+       , case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'eta') else null end as "Intl Est Arrival Date"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIPNAME') as "Local Ship Name"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL VOYAGE') as "Local Voyage"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL ESTARRIVE') as "Local Est Arrival Date"
+       , (select s3.convoyname from strang.convoy s3 where s3.convoy_id = m.convoy_id) as "Convoy Name"
+       , (select s3.convoy_type from strang.convoy s3 where s3.convoy_id  = m.convoy_id) as "Convoy Type"
+	   , (select s3.estdepart from strang.convoy s3 where s3.convoy_id  = m.convoy_id ) as "Convoy Depart Date"
+ -------------------------------------------------------------------------------
+       , dr.hawb_hawbno as "Hawb Intl"
+       , dr.hawb_hawbno_2 as "Hawb Local"
+       , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
@@ -144,57 +115,40 @@ c.customer_type = 'SUPPLIER' and
             where  dr.movement_no is not null
              and   dr2.deliveryno = dr.deliveryno
              and   dr2.itemno  = dr.itemno) 
-UNION ALL
-select  
- p.deliveryno as "Delivery No"
-,p.recno as "PO Rno"
-,p.po as "Purchase Order"
-,p.po_item_no as "PO Item No"
-,p.inventoryno as "Material No"
-,p.supinv as "Invoice"
-,p.sap_delno_qty as "Quantity"
-,p.sap_delno_unit as "Unit"
-,p.grn as "GRN"
-,p.off_site_receipt as "Receipted Date"
-,c.customer as "Vendor"
-,dr.logno as "Log No"
-,dr.itemno as "Delivery Item"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'WAREHOUSE_DESTINATION') as "Warehouse Destination"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'CURRENT_LOCATION') as "Current Location"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'URGENCY') as "Priority"
-,nvl(p.shipping_text,(decode(dr.sa,'S','Pack for Sea Freight','A','Pack for Air Freight'))) as "Mode"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'MOVEMENT_NO') as "Container"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SEAL') as Seal
-,nvl(to_char(dr.hawb_hawbno),' ') as HAWB 
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIP ID') as "Intl Ship ID"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIPNAME') as "Intl Ship/MAWB"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL VOYAGE') as "Intl Voyage"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'etd') else null end as "Intl ETD"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'eta') else null end as "Intl ETA"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'depart') else null end as "Intl Port of Loading"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'arrive') else null end as "Intl Port of Discharge"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'BOL') as "Intl Bol"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'CUSTOMS_CLEARED_DATE') as "Customs Cleared Date"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIP ID') as "Local Ship ID"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIPNAME') as "Local Ship"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL VOYAGE') as "Local Voyage"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL BOL') as "Local Bol"
-, strang.f_getshipfields_mv(m.movement_no,m.seal,'L','ESTDEPART') as "Local ETD" 
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL ESTARRIVE') as "Local ETA"
-, strang.f_getlocdesc(strang.f_getshipfields_mv(m.movement_no,m.seal,'L','PORTLOAD')) as "Local Port of Loading"
-, strang.f_getlocdesc(strang.f_getshipfields_mv(m.movement_no,m.seal,'L','PORTDISC')) as "Local Port of Discharge"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SCHEDULED CONVOY') as "Scheduled Convoy"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SCHEDULED CONVOY DATE') as "Scheduled Convoy Date"
-       , nvl(strang.f_getLovColumn( 'UNCTNTAB', 'COLA', m.iso_container_type),m.iso_container_type) as "ISO Container Type"
-       , m.owner  "Container Owner"
-       , decode(m.iso_container_type,null,'BBULK','FCL') "Cargo"
-       , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') as "Description"
-       , round((nvl(m.vgm,(nvl(m.sumweight,0)+nvl(m.tare,0)))/1000),3) as "Gross Weight in Tonne"
-       , nvl(m.sumvolume,0) as "Cargo Volume"
-       , m.consignee||' '||strang.f_getlocdesc(m.consignee_location)||' '||strang.f_getlocdesc(m.warehouse_destination)||' '||m.warehouse_destination as "Consignee"
-       , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'HAZARDOUS') as "Hazardous Codes"
-       , 'MOTUKEA' as "Controlling Office"
-       , strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION',m.complete) as "packing Status" 
+UNION ALL  -- 3
+select p.po as "Purchase Order"
+       , p.po_item_no as "PO Item No"
+       , p.grn as "GRN"
+       , p.grn_item as "GRN Item"
+       , p.deliveryno as "Delivery No"
+       , p.recno as "PO Rno"
+       , strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION', m.complete) packing_status
+       , m.urgency  as "Priority"
+       , m.movement_type as "Movement Type"
+       , m.movement_no as "Container"
+       , m.seal as "Seal"
+       , case when m.io = 'I' then 'INBOUND' else 'OUTBOUND' end as "Direction"
+       , m.full_mt as "Full Or Empty"
+-------------------------------------------------------------------------------------           
+       , m.consignee as "Consignee"
+       , strang.f_getlovColumn('LOCATIONS','DESCRIPTION', m.consignee_location) as "Consignee Location"
+       , m.warehouse_destination as "Warehouse Destination"
+       , strang.f_getlovColumn('LOCATIONS','DESCRIPTION', m.current_location)  as "Current Location"
+       , m.customs_cleared_date as "Customs Cleared Date"
+       , m.local_bol as "Local BOL"
+       , m.bol as "Intl BOL"     
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIPNAME') as "Intl Ship Name"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL VOYAGE')  as "Intl Voyage"
+       , case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'eta') else null end as "Intl Est Arrival Date"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIPNAME') as "Local Ship Name"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL VOYAGE') as "Local Voyage"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL ESTARRIVE') as "Local Est Arrival Date"
+       , (select s3.convoyname from strang.convoy s3 where s3.convoy_id = m.convoy_id) as "Convoy Name"
+       , (select s3.convoy_type from strang.convoy s3 where s3.convoy_id  = m.convoy_id) as "Convoy Type"
+	   , (select s3.estdepart from strang.convoy s3 where s3.convoy_id  = m.convoy_id ) as "Convoy Depart Date"
+       , dr.hawb_hawbno as "Hawb Intl"
+       , dr.hawb_hawbno_2 as "Hawb Local"
+       , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 --substr(p.po,1,2) in ('47','43','45') and
@@ -218,57 +172,40 @@ c.customer_type = 'SUPPLIER' and
             where  dr.movement_no is not null
              and   dr2.deliveryno = dr.deliveryno
              and   dr2.itemno  = dr.itemno)     
-union ALL
-select  
- p.deliveryno as "Delivery No"
-,p.recno as "PO Rno"
-,p.po as "Purchase Order"
-,p.po_item_no as "PO Item No"
-,p.inventoryno as "Material No"
-,p.supinv as "Invoice"
-,p.sap_delno_qty as "Quantity"
-,p.sap_delno_unit as "Unit"
-,p.grn as "GRN"
-,p.off_site_receipt as "Receipted Date"
-,c.customer as "Vendor"
-,dr.logno as "Log No"
-,dr.itemno as "Delivery Item"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'WAREHOUSE_DESTINATION') as "Warehouse Destination"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'CURRENT_LOCATION') as "Current Location"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'URGENCY') as "Priority"
-,nvl(p.shipping_text,(decode(dr.sa,'S','Pack for Sea Freight','A','Pack for Air Freight'))) as "Mode"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'MOVEMENT_NO') as "Container"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SEAL') as Seal
-,nvl(to_char(dr.hawb_hawbno),' ') as HAWB 
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIP ID') as "Intl Ship ID"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIPNAME') as "Intl Ship/MAWB"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL VOYAGE') as "Intl Voyage"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'etd') else null end as "Intl ETD"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'eta') else null end as "Intl ETA"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'depart') else null end as "Intl Port of Loading"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'arrive') else null end as "Intl Port of Discharge"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'BOL') as "Intl Bol"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'CUSTOMS_CLEARED_DATE') as "Customs Cleared Date"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIP ID') as "Local Ship ID"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIPNAME') as "Local Ship"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL VOYAGE') as "Local Voyage"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL BOL') as "Local Bol"
-, strang.f_getshipfields_mv(m.movement_no,m.seal,'L','ESTDEPART') as "Local ETD" 
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL ESTARRIVE') as "Local ETA"
-, strang.f_getlocdesc(strang.f_getshipfields_mv(m.movement_no,m.seal,'L','PORTLOAD')) as "Local Port of Loading"
-, strang.f_getlocdesc(strang.f_getshipfields_mv(m.movement_no,m.seal,'L','PORTDISC')) as "Local Port of Discharge"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SCHEDULED CONVOY') as "Scheduled Convoy"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SCHEDULED CONVOY DATE') as "Scheduled Convoy Date"
-       , nvl(strang.f_getLovColumn( 'UNCTNTAB', 'COLA', m.iso_container_type),m.iso_container_type) as "ISO Container Type"
-       , m.owner  "Container Owner"
-       , decode(m.iso_container_type,null,'BBULK','FCL') "Cargo"
-       , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') as "Description"
-       , round((nvl(m.vgm,(nvl(m.sumweight,0)+nvl(m.tare,0)))/1000),3) as "Gross Weight in Tonne"
-       , nvl(m.sumvolume,0) as "Cargo Volume"
-       , m.consignee||' '||strang.f_getlocdesc(m.consignee_location)||' '||strang.f_getlocdesc(m.warehouse_destination)||' '||m.warehouse_destination as "Consignee"
-       , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'HAZARDOUS') as "Hazardous Codes"
-       , 'BRISBANE' as "Controlling Office"
-       , strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION',m.complete) as "packing Status" 
+union ALL -- 4
+select p.po as "Purchase Order"
+       , p.po_item_no as "PO Item No"
+       , p.grn as "GRN"
+       , p.grn_item as "GRN Item"
+       , p.deliveryno as "Delivery No"
+       , p.recno as "PO Rno"
+       , strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION', m.complete) packing_status
+       , m.urgency  as "Priority"
+       , m.movement_type as "Movement Type"
+       , m.movement_no as "Container"
+       , m.seal as "Seal"
+       , case when m.io = 'I' then 'INBOUND' else 'OUTBOUND' end as "Direction"
+       , m.full_mt as "Full Or Empty"
+-------------------------------------------------------------------------------------           
+       , m.consignee as "Consignee"
+       , strang.f_getlovColumn('LOCATIONS','DESCRIPTION', m.consignee_location) as "Consignee Location"
+       , m.warehouse_destination as "Warehouse Destination"
+       , strang.f_getlovColumn('LOCATIONS','DESCRIPTION', m.current_location)  as "Current Location"
+       , m.customs_cleared_date as "Customs Cleared Date"
+       , m.local_bol as "Local BOL"
+       , m.bol as "Intl BOL"   
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIPNAME') as "Intl Ship Name"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL VOYAGE')  as "Intl Voyage"
+       , case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'eta') else null end as "Intl Est Arrival Date"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIPNAME') as "Local Ship Name"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL VOYAGE') as "Local Voyage"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL ESTARRIVE') as "Local Est Arrival Date"
+       , (select s3.convoyname from strang.convoy s3 where s3.convoy_id = m.convoy_id) as "Convoy Name"
+       , (select s3.convoy_type from strang.convoy s3 where s3.convoy_id  = m.convoy_id) as "Convoy Type"
+	   , (select s3.estdepart from strang.convoy s3 where s3.convoy_id  = m.convoy_id ) as "Convoy Depart Date"
+       , dr.hawb_hawbno as "Hawb Intl"
+       , dr.hawb_hawbno_2 as "Hawb Local"
+       , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
@@ -292,57 +229,42 @@ c.customer_type = 'SUPPLIER' and
             where  dr.movement_no is not null
              and   dr2.deliveryno = dr.deliveryno
              and   dr2.itemno  = dr.itemno)          
-union ALL
-select  
- p.deliveryno as "Delivery No"
-,p.recno as "PO Rno"
-,p.po as "Purchase Order"
-,p.po_item_no as "PO Item No"
-,p.inventoryno as "Material No"
-,p.supinv as "Invoice"
-,p.sap_delno_qty as "Quantity"
-,p.sap_delno_unit as "Unit"
-,p.grn as "GRN"
-,p.off_site_receipt as "Receipted Date"
-,c.customer as "Vendor"
-,dr.logno as "Log No"
-,dr.itemno as "Delivery Item"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'WAREHOUSE_DESTINATION') as "Warehouse Destination"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'CURRENT_LOCATION') as "Current Location"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'URGENCY') as "Priority"
-,nvl(p.shipping_text,(decode(dr.sa,'S','Pack for Sea Freight','A','Pack for Air Freight'))) as "Mode"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'MOVEMENT_NO') as "Container"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SEAL') as Seal
-,nvl(to_char(dr.hawb_hawbno),' ') as HAWB 
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIP ID') as "Intl Ship ID"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIPNAME') as "Intl Ship/MAWB"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL VOYAGE') as "Intl Voyage"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'etd') else null end as "Intl ETD"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'eta') else null end as "Intl ETA"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'depart') else null end as "Intl Port of Loading"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'arrive') else null end as "Intl Port of Discharge"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'BOL') as "Intl Bol"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'CUSTOMS_CLEARED_DATE') as "Customs Cleared Date"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIP ID') as "Local Ship ID"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIPNAME') as "Local Ship"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL VOYAGE') as "Local Voyage"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL BOL') as "Local Bol"
-, strang.f_getshipfields_mv(m.movement_no,m.seal,'L','ESTDEPART') as "Local ETD" 
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL ESTARRIVE') as "Local ETA"
-,strang.f_getlocdesc(strang.f_getshipfields_mv(m.movement_no,m.seal,'L','PORTLOAD')) as "Local Port of Loading"
-,strang.f_getlocdesc(strang.f_getshipfields_mv(m.movement_no,m.seal,'L','PORTDISC')) as "Local Port of Discharge"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SCHEDULED CONVOY') as "Scheduled Convoy"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SCHEDULED CONVOY DATE') as "Scheduled Convoy Date"
-,nvl(strang.f_getLovColumn( 'UNCTNTAB', 'COLA', m.iso_container_type),m.iso_container_type) as "ISO Container Type"
-,m.owner  "Container Owner"
-,decode(m.iso_container_type,null,'BBULK','FCL') "Cargo"
-,strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') as "Description"
-,round((nvl(m.vgm,(nvl(m.sumweight,0)+nvl(m.tare,0)))/1000),3) as "Gross Weight in Tonne"
-,nvl(m.sumvolume,0) as "Cargo Volume"
-,m.consignee||' '||strang.f_getlocdesc(m.consignee_location)||' '||strang.f_getlocdesc(m.warehouse_destination)||' '||m.warehouse_destination as "Consignee"
-,strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'HAZARDOUS') as "Hazardous Codes"
-,NVL( (SELECT COLC from strang.lov where lov_name='LOCATIONS' and code = m.current_location) , 'UNKNOWN') as "Controlling Office"
-,strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION',m.complete) as "packing Status" 
+union ALL  -- 5
+select p.po as "Purchase Order"
+       , p.po_item_no as "PO Item No"
+       , p.grn as "GRN"
+       , p.grn_item as "GRN Item"
+       , p.deliveryno as "Delivery No"
+       , p.recno as "PO Rno"
+       , strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION', m.complete) packing_status
+       , m.urgency  as "Priority"
+       , m.movement_type as "Movement Type"
+       , m.movement_no as "Container"
+       , m.seal as "Seal"
+       , case when m.io = 'I' then 'INBOUND' else 'OUTBOUND' end as "Direction"
+       , m.full_mt as "Full Or Empty"
+-------------------------------------------------------------------------------------           
+       , m.consignee as "Consignee"
+       , strang.f_getlovColumn('LOCATIONS','DESCRIPTION', m.consignee_location) as "Consignee Location"
+       , m.warehouse_destination as "Warehouse Destination"
+       , strang.f_getlovColumn('LOCATIONS','DESCRIPTION', m.current_location)  as "Current Location"
+       , m.customs_cleared_date as "Customs Cleared Date"
+       , m.local_bol as "Local BOL"
+       , m.bol as "Intl BOL"
+ -------------------------------------------------------------------------------------        
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIPNAME') as "Intl Ship Name"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL VOYAGE')  as "Intl Voyage"
+       , case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'eta') else null end as "Intl Est Arrival Date"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIPNAME') as "Local Ship Name"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL VOYAGE') as "Local Voyage"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL ESTARRIVE') as "Local Est Arrival Date"
+       , (select s3.convoyname from strang.convoy s3 where s3.convoy_id = m.convoy_id) as "Convoy Name"
+       , (select s3.convoy_type from strang.convoy s3 where s3.convoy_id  = m.convoy_id) as "Convoy Type"
+	   , (select s3.estdepart from strang.convoy s3 where s3.convoy_id  = m.convoy_id ) as "Convoy Depart Date"
+ -------------------------------------------------------------------------------
+       , dr.hawb_hawbno as "Hawb Intl"
+       , dr.hawb_hawbno_2 as "Hawb Local"
+       , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
 from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
@@ -360,7 +282,7 @@ m.current_location in (select code from strang.lov where lov_name='LOCATIONS' an
 --dr.DELIVERYNO between 9000000 and 9999999 ) and
 --p.grn_status in (1,8,9) and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
-r.currdate >  sysdate - 700 and 
+r.currdate >  sysdate - 720 and 
 c.customer_type = 'SUPPLIER' and 
  exists (select 1
              from  strang.detailrs dr2
@@ -370,129 +292,50 @@ c.customer_type = 'SUPPLIER' and
  order by 1, 3, 4, 6;
  
  
--- 
--- 
---  select /*+ ALL_ROWS */
---         distinct
---         p.rowid,
---         p.deliveryno as "Delivery No", 
---         p.recno as "PO Rno", 
---         p.po as "Purchase Order",
---         p.po_item_no as "PO Item No",
---         p.inventoryno as "Material No",
---         p.supinv as "Invoice",
---         p.sap_delno_qty as "Quantity",
---         p.sap_delno_unit as "Unit",
---         p.grn as "GRN",
---         p.off_site_receipt as "Receipted Date",
---         c.customer as "Vendor",
---         dr.logno as "Log No",
---         dr.itemno as "Delivery Item",
---         strang.f_get_info_for_po(p.deliveryno,dr.itemno,'WAREHOUSE_DESTINATION') as "Warehouse Destination",
---         strang.f_get_info_for_po(p.deliveryno,dr.itemno,'CURRENT_LOCATION') as "Current Location",
---         strang.f_get_info_for_po(p.deliveryno,dr.itemno,'URGENCY') as "Priority",
---         nvl(p.shipping_text,(decode(dr.sa,'S','Pack for Sea Freight','A','Pack for Air Freight'))) as "Mode",
---         strang.f_get_info_for_po(p.deliveryno,dr.itemno,'MOVEMENT_NO') as "Container",
---         strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SEAL') as "Seal",
---         nvl(to_char(dr.hawb_hawbno),' ') as "HAWB",
---         strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIP ID') as "Intl Ship ID",
---         strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIPNAME') as "Intl Ship/MAWB",
---         strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL VOYAGE') as "Intl Voyage",
---         to_char(dr.line_no) as "Intl Line No",
---         strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL ESTARRIVE') as "Intl ETA",
---         strang.f_get_info_for_po(p.deliveryno,dr.itemno,'BOL') as "Intl Bol",
---         strang.f_get_info_for_po(p.deliveryno,dr.itemno,'CUSTOMS_CLEARED_DATE') as "Customs Cleared Date",
---         strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIP ID') as "Local Ship ID",
---         strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIPNAME') as "Local Ship",
---         strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL VOYAGE') as "Local Voyage",
---         to_char(dr.local_line_no) as "Local Line No",
---         strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL BOL') as "Local Bol",
---         strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL ESTARRIVE') as "Local ETA",
---         strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SCHEDULED CONVOY') as "Scheduled Convoy",
---         strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SCHEDULED CONVOY DATE') as "Scheduled Convoy Date"  
---    from strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
---    where p.deliveryno = dr.deliveryno and
---    p.deliveryno = r.deliveryno and 
---    r.cust_customer_id = 1 and 
---    dr.io = 'I' and 
---    p.grn_status in (1,8,9) and 
---    nvl(r.supplier_customer_id,0) = c.customer_id and 
---    r.currdate >  sysdate - 180 and 
---    c.customer_type = 'SUPPLIER' and 
---    not exists 
---    ( select  p1.deliveryno 
---        from strang.pos p1, strang.detailrs dr, strang.receivals r, strang.movements m, strang.lov l1, strang.lov l2 
---       where p1.deliveryno = r.deliveryno and 
---            p1.deliveryno = dr.deliveryno and 
---            p1.deliveryno = p.deliveryno and
---            r.cust_customer_id = 1 and
---            dr.io = 'I' and
---            dr.movement_no = m.movement_no and
---            nvl(dr.camov_seal,'|') = nvl(m.seal,'|') and 
---            m.warehouse_destination = l1.code and
---            l1.lov_name = 'LOCATIONS' and
---            m.current_location = l2.code and
---            l2.lov_name = 'LOCATIONS' and
---            l1.colc = l2.colc )      
---      order by p.deliveryno, p.po, p.po_item_no, p.supinv, dr.logno   
--- ;
 
  cursor c2 is
    select count('x') tot
    from
-   (     select p.deliveryno as "Delivery No"
-      ,  p.recno as "PO Rno"
-      ,  p.po as "Purchase Order"
-      ,  p.po_item_no as "PO Item No"
-      ,  p.inventoryno as "Material No"
-      ,  p.supinv as "Invoice"
-      ,  p.sap_delno_qty as "Quantity"
-      ,  p.sap_delno_unit as "Unit"
-      ,  p.grn as "GRN"
-      ,  p.off_site_receipt as "Receipted Date"
-      ,  c.customer as "Vendor"
-      ,  dr.logno as "Log No"
-      ,  dr.itemno as "Delivery Item"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'WAREHOUSE_DESTINATION') as "Warehouse Destination"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'CURRENT_LOCATION') as "Current Location"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'URGENCY') as "Priority"
-      ,  nvl(p.shipping_text,(decode(dr.sa,'S','Pack for Sea Freight','A','Pack for Air Freight'))) as "Mode"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'MOVEMENT_NO') as "Container"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SEAL') as "Seal"
-      ,  nvl(to_char(dr.hawb_hawbno),' ') as "HAWB" 
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIP ID') as "Intl Ship ID"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIPNAME') as "Intl Ship/MAWB"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL VOYAGE') as "Intl Voyage"
-      ,  case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'etd') else null end as "Intl ETD"
-      ,  case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'eta') else null end as "Intl ETA"
-      ,  case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'depart') else null end as "Intl Port of Loading"
-      ,  case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'arrive') else null end as "Intl Port of Discharge"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'BOL') as "Intl Bol"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'CUSTOMS_CLEARED_DATE') as "Customs Cleared Date"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIP ID') as "Local Ship ID"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIPNAME') as "Local Ship"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL VOYAGE') as "Local Voyage"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL BOL') as "Local Bol"
-      ,  strang.f_getshipfields_mv(m.movement_no,m.seal,'L','ESTDEPART') as "Local ETD" 
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL ESTARRIVE') as "Local ETA"
-      ,  strang.f_getlocdesc(strang.f_getshipfields_mv(m.movement_no,m.seal,'L','PORTLOAD')) as "Local Port of Loading"
-      ,  strang.f_getlocdesc(strang.f_getshipfields_mv(m.movement_no,m.seal,'L','PORTDISC')) as "Local Port of Discharge"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SCHEDULED CONVOY') as "Scheduled Convoy"
-      ,  strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SCHEDULED CONVOY DATE') as "Scheduled Convoy Date"
-      ,  nvl(strang.f_getLovColumn( 'UNCTNTAB', 'COLA', m.iso_container_type),m.iso_container_type) as "ISO Container Type"
-      ,  m.owner  "Container Owner"
-      ,  decode(m.iso_container_type,null,'BBULK','FCL') "Cargo"
-      ,  strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') as "Description"
-      ,  round((nvl(m.vgm,(nvl(m.sumweight,0)+nvl(m.tare,0)))/1000),3) as "Gross Weight in Tonne"
-      ,  nvl(m.sumvolume,0) as "Cargo Volume"
-      ,  m.consignee||' '||strang.f_getlocdesc(m.consignee_location)||' '||strang.f_getlocdesc(m.warehouse_destination)||' '||m.warehouse_destination as "Consignee"
-      ,  strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'HAZARDOUS') as "Hazardous Codes"
-      ,  'TABUBIL' as "Controlling Office"
-      ,  strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION',m.complete) as "packing Status" 
-   from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
+   (      select p.po as "Purchase Order"
+       , p.po_item_no as "PO Item No"
+       , p.grn as "GRN"
+       , p.grn_item as "GRN Item"
+       , p.deliveryno as "Delivery No"
+       , p.recno as "PO Rno"
+       , strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION', m.complete) packing_status
+       , m.urgency  as "Priority"
+       , m.movement_type as "Movement Type"
+       , m.movement_no as "Container"
+       , m.seal as "Seal"
+       , case when m.io = 'I' then 'INBOUND' else 'OUTBOUND' end as "Direction"
+       , m.full_mt as "Full Or Empty"
+-------------------------------------------------------------------------------------           
+       , m.consignee as "Consignee"
+       , strang.f_getlovColumn('LOCATIONS','DESCRIPTION', m.consignee_location) as "Consignee Location"
+       , m.warehouse_destination as "Warehouse Destination"
+       , strang.f_getlovColumn('LOCATIONS','DESCRIPTION', m.current_location)  as "Current Location"
+       , m.customs_cleared_date as "Customs Cleared Date"
+       , m.local_bol as "Local BOL"
+       , m.bol as "Intl BOL"
+ -------------------------------------------------------------------------------------        
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIPNAME') as "Intl Ship Name"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL VOYAGE')  as "Intl Voyage"
+       , case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'eta') else null end as "Intl Est Arrival Date"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIPNAME') as "Local Ship Name"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL VOYAGE') as "Local Voyage"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL ESTARRIVE') as "Local Est Arrival Date"
+       , (select s3.convoyname from strang.convoy s3 where s3.convoy_id = m.convoy_id) as "Convoy Name"
+       , (select s3.convoy_type from strang.convoy s3 where s3.convoy_id  = m.convoy_id) as "Convoy Type"
+	   , (select s3.estdepart from strang.convoy s3 where s3.convoy_id  = m.convoy_id ) as "Convoy Depart Date"
+ -------------------------------------------------------------------------------
+       , dr.hawb_hawbno as "Hawb Intl"
+       , dr.hawb_hawbno_2 as "Hawb Local"
+       , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
+   from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r
+      , strang.customers c
   where p.deliveryno = dr.deliveryno and 
         p.deliveryno = r.deliveryno and 
-        r.currdate >  sysdate - 700 and 
+        r.currdate >  sysdate - 720 and 
      --   substr(p.po,1,2) in ('47','43','45') and
         r.cust_customer_id = 1 and 
         dr.io = 'I' and 
@@ -504,64 +347,48 @@ c.customer_type = 'SUPPLIER' and
         m.io='I' and 
         m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'TABUBIL') and 
         nvl(r.supplier_customer_id,0) = c.customer_id and 
-        r.currdate >  sysdate - 720 and 
         c.customer_type = 'SUPPLIER' and 
         exists (select 1
                   from strang.detailrs dr2
                  where dr.movement_no is not null
                    and dr2.deliveryno = dr.deliveryno
                    and dr2.itemno  = dr.itemno)            
-union all
-select  
- p.deliveryno as "Delivery No"
-,p.recno as "PO Rno"
-,p.po as "Purchase Order"
-,p.po_item_no as "PO Item No"
-,p.inventoryno as "Material No"
-,p.supinv as "Invoice"
-,p.sap_delno_qty as "Quantity"
-,p.sap_delno_unit as "Unit"
-,p.grn as "GRN"
-,p.off_site_receipt as "Receipted Date"
-,c.customer as "Vendor"
-,dr.logno as "Log No"
-,dr.itemno as "Delivery Item"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'WAREHOUSE_DESTINATION') as "Warehouse Destination"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'CURRENT_LOCATION') as "Current Location"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'URGENCY') as "Priority"
-,nvl(p.shipping_text,(decode(dr.sa,'S','Pack for Sea Freight','A','Pack for Air Freight'))) as "Mode"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'MOVEMENT_NO') as "Container"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SEAL') as Seal
-,nvl(to_char(dr.hawb_hawbno),' ') as HAWB 
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIP ID') as "Intl Ship ID"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIPNAME') as "Intl Ship/MAWB"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL VOYAGE') as "Intl Voyage"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'etd') else null end as "Intl ETD"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'eta') else null end as "Intl ETA"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'depart') else null end as "Intl Port of Loading"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'arrive') else null end as "Intl Port of Discharge"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'BOL') as "Intl Bol"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'CUSTOMS_CLEARED_DATE') as "Customs Cleared Date"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIP ID') as "Local Ship ID"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIPNAME') as "Local Ship"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL VOYAGE') as "Local Voyage"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL BOL') as "Local Bol"
-, strang.f_getshipfields_mv(m.movement_no,m.seal,'L','ESTDEPART') as "Local ETD" 
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL ESTARRIVE') as "Local ETA"
-, strang.f_getlocdesc(strang.f_getshipfields_mv(m.movement_no,m.seal,'L','PORTLOAD')) as "Local Port of Loading"
-, strang.f_getlocdesc(strang.f_getshipfields_mv(m.movement_no,m.seal,'L','PORTDISC')) as "Local Port of Discharge"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SCHEDULED CONVOY') as "Scheduled Convoy"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SCHEDULED CONVOY DATE') as "Scheduled Convoy Date"
-       , nvl(strang.f_getLovColumn( 'UNCTNTAB', 'COLA', m.iso_container_type),m.iso_container_type) as "ISO Container Type"
-       , m.owner  "Container Owner"
-       , decode(m.iso_container_type,null,'BBULK','FCL') "Cargo"
-       , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') as "Description"
-       , round((nvl(m.vgm,(nvl(m.sumweight,0)+nvl(m.tare,0)))/1000),3) as "Gross Weight in Tonne"
-       , nvl(m.sumvolume,0) as "Cargo Volume"
-       , m.consignee||' '||strang.f_getlocdesc(m.consignee_location)||' '||strang.f_getlocdesc(m.warehouse_destination)||' '||m.warehouse_destination as "Consignee"
-       , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'HAZARDOUS') as "Hazardous Codes"
-       , 'KIUNGA' as "Controlling Office"
-       , strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION',m.complete) as "packing Status" 
+union all  -- 2 
+select p.po as "Purchase Order"
+       , p.po_item_no as "PO Item No"
+       , p.grn as "GRN"
+       , p.grn_item as "GRN Item"
+       , p.deliveryno as "Delivery No"
+       , p.recno as "PO Rno"
+       , strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION', m.complete) packing_status
+       , m.urgency  as "Priority"
+       , m.movement_type as "Movement Type"
+       , m.movement_no as "Container"
+       , m.seal as "Seal"
+       , case when m.io = 'I' then 'INBOUND' else 'OUTBOUND' end as "Direction"
+       , m.full_mt as "Full Or Empty"
+-------------------------------------------------------------------------------------           
+       , m.consignee as "Consignee"
+       , strang.f_getlovColumn('LOCATIONS','DESCRIPTION', m.consignee_location) as "Consignee Location"
+       , m.warehouse_destination as "Warehouse Destination"
+       , strang.f_getlovColumn('LOCATIONS','DESCRIPTION', m.current_location)  as "Current Location"
+       , m.customs_cleared_date as "Customs Cleared Date"
+       , m.local_bol as "Local BOL"
+       , m.bol as "Intl BOL"
+ -------------------------------------------------------------------------------------        
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIPNAME') as "Intl Ship Name"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL VOYAGE')  as "Intl Voyage"
+       , case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'eta') else null end as "Intl Est Arrival Date"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIPNAME') as "Local Ship Name"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL VOYAGE') as "Local Voyage"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL ESTARRIVE') as "Local Est Arrival Date"
+       , (select s3.convoyname from strang.convoy s3 where s3.convoy_id = m.convoy_id) as "Convoy Name"
+       , (select s3.convoy_type from strang.convoy s3 where s3.convoy_id  = m.convoy_id) as "Convoy Type"
+	   , (select s3.estdepart from strang.convoy s3 where s3.convoy_id  = m.convoy_id ) as "Convoy Depart Date"
+ -------------------------------------------------------------------------------
+       , dr.hawb_hawbno as "Hawb Intl"
+       , dr.hawb_hawbno_2 as "Hawb Local"
+       , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
@@ -582,57 +409,40 @@ c.customer_type = 'SUPPLIER' and
             where  dr.movement_no is not null
              and   dr2.deliveryno = dr.deliveryno
              and   dr2.itemno  = dr.itemno) 
-UNION ALL
-select  
- p.deliveryno as "Delivery No"
-,p.recno as "PO Rno"
-,p.po as "Purchase Order"
-,p.po_item_no as "PO Item No"
-,p.inventoryno as "Material No"
-,p.supinv as "Invoice"
-,p.sap_delno_qty as "Quantity"
-,p.sap_delno_unit as "Unit"
-,p.grn as "GRN"
-,p.off_site_receipt as "Receipted Date"
-,c.customer as "Vendor"
-,dr.logno as "Log No"
-,dr.itemno as "Delivery Item"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'WAREHOUSE_DESTINATION') as "Warehouse Destination"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'CURRENT_LOCATION') as "Current Location"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'URGENCY') as "Priority"
-,nvl(p.shipping_text,(decode(dr.sa,'S','Pack for Sea Freight','A','Pack for Air Freight'))) as "Mode"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'MOVEMENT_NO') as "Container"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SEAL') as Seal
-,nvl(to_char(dr.hawb_hawbno),' ') as HAWB 
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIP ID') as "Intl Ship ID"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIPNAME') as "Intl Ship/MAWB"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL VOYAGE') as "Intl Voyage"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'etd') else null end as "Intl ETD"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'eta') else null end as "Intl ETA"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'depart') else null end as "Intl Port of Loading"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'arrive') else null end as "Intl Port of Discharge"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'BOL') as "Intl Bol"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'CUSTOMS_CLEARED_DATE') as "Customs Cleared Date"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIP ID') as "Local Ship ID"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIPNAME') as "Local Ship"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL VOYAGE') as "Local Voyage"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL BOL') as "Local Bol"
-, strang.f_getshipfields_mv(m.movement_no,m.seal,'L','ESTDEPART') as "Local ETD" 
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL ESTARRIVE') as "Local ETA"
-, strang.f_getlocdesc(strang.f_getshipfields_mv(m.movement_no,m.seal,'L','PORTLOAD')) as "Local Port of Loading"
-, strang.f_getlocdesc(strang.f_getshipfields_mv(m.movement_no,m.seal,'L','PORTDISC')) as "Local Port of Discharge"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SCHEDULED CONVOY') as "Scheduled Convoy"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SCHEDULED CONVOY DATE') as "Scheduled Convoy Date"
-       , nvl(strang.f_getLovColumn( 'UNCTNTAB', 'COLA', m.iso_container_type),m.iso_container_type) as "ISO Container Type"
-       , m.owner  "Container Owner"
-       , decode(m.iso_container_type,null,'BBULK','FCL') "Cargo"
-       , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') as "Description"
-       , round((nvl(m.vgm,(nvl(m.sumweight,0)+nvl(m.tare,0)))/1000),3) as "Gross Weight in Tonne"
-       , nvl(m.sumvolume,0) as "Cargo Volume"
-       , m.consignee||' '||strang.f_getlocdesc(m.consignee_location)||' '||strang.f_getlocdesc(m.warehouse_destination)||' '||m.warehouse_destination as "Consignee"
-       , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'HAZARDOUS') as "Hazardous Codes"
-       , 'MOTUKEA' as "Controlling Office"
-       , strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION',m.complete) as "packing Status" 
+UNION ALL  -- 3
+select p.po as "Purchase Order"
+       , p.po_item_no as "PO Item No"
+       , p.grn as "GRN"
+       , p.grn_item as "GRN Item"
+       , p.deliveryno as "Delivery No"
+       , p.recno as "PO Rno"
+       , strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION', m.complete) packing_status
+       , m.urgency  as "Priority"
+       , m.movement_type as "Movement Type"
+       , m.movement_no as "Container"
+       , m.seal as "Seal"
+       , case when m.io = 'I' then 'INBOUND' else 'OUTBOUND' end as "Direction"
+       , m.full_mt as "Full Or Empty"
+-------------------------------------------------------------------------------------           
+       , m.consignee as "Consignee"
+       , strang.f_getlovColumn('LOCATIONS','DESCRIPTION', m.consignee_location) as "Consignee Location"
+       , m.warehouse_destination as "Warehouse Destination"
+       , strang.f_getlovColumn('LOCATIONS','DESCRIPTION', m.current_location)  as "Current Location"
+       , m.customs_cleared_date as "Customs Cleared Date"
+       , m.local_bol as "Local BOL"
+       , m.bol as "Intl BOL"     
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIPNAME') as "Intl Ship Name"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL VOYAGE')  as "Intl Voyage"
+       , case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'eta') else null end as "Intl Est Arrival Date"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIPNAME') as "Local Ship Name"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL VOYAGE') as "Local Voyage"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL ESTARRIVE') as "Local Est Arrival Date"
+       , (select s3.convoyname from strang.convoy s3 where s3.convoy_id = m.convoy_id) as "Convoy Name"
+       , (select s3.convoy_type from strang.convoy s3 where s3.convoy_id  = m.convoy_id) as "Convoy Type"
+	   , (select s3.estdepart from strang.convoy s3 where s3.convoy_id  = m.convoy_id ) as "Convoy Depart Date"
+       , dr.hawb_hawbno as "Hawb Intl"
+       , dr.hawb_hawbno_2 as "Hawb Local"
+       , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 --substr(p.po,1,2) in ('47','43','45') and
@@ -656,57 +466,40 @@ c.customer_type = 'SUPPLIER' and
             where  dr.movement_no is not null
              and   dr2.deliveryno = dr.deliveryno
              and   dr2.itemno  = dr.itemno)     
-union ALL
-select  
- p.deliveryno as "Delivery No"
-,p.recno as "PO Rno"
-,p.po as "Purchase Order"
-,p.po_item_no as "PO Item No"
-,p.inventoryno as "Material No"
-,p.supinv as "Invoice"
-,p.sap_delno_qty as "Quantity"
-,p.sap_delno_unit as "Unit"
-,p.grn as "GRN"
-,p.off_site_receipt as "Receipted Date"
-,c.customer as "Vendor"
-,dr.logno as "Log No"
-,dr.itemno as "Delivery Item"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'WAREHOUSE_DESTINATION') as "Warehouse Destination"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'CURRENT_LOCATION') as "Current Location"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'URGENCY') as "Priority"
-,nvl(p.shipping_text,(decode(dr.sa,'S','Pack for Sea Freight','A','Pack for Air Freight'))) as "Mode"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'MOVEMENT_NO') as "Container"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SEAL') as Seal
-,nvl(to_char(dr.hawb_hawbno),' ') as HAWB 
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIP ID') as "Intl Ship ID"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIPNAME') as "Intl Ship/MAWB"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL VOYAGE') as "Intl Voyage"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'etd') else null end as "Intl ETD"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'eta') else null end as "Intl ETA"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'depart') else null end as "Intl Port of Loading"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'arrive') else null end as "Intl Port of Discharge"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'BOL') as "Intl Bol"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'CUSTOMS_CLEARED_DATE') as "Customs Cleared Date"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIP ID') as "Local Ship ID"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIPNAME') as "Local Ship"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL VOYAGE') as "Local Voyage"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL BOL') as "Local Bol"
-, strang.f_getshipfields_mv(m.movement_no,m.seal,'L','ESTDEPART') as "Local ETD" 
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL ESTARRIVE') as "Local ETA"
-, strang.f_getlocdesc(strang.f_getshipfields_mv(m.movement_no,m.seal,'L','PORTLOAD')) as "Local Port of Loading"
-, strang.f_getlocdesc(strang.f_getshipfields_mv(m.movement_no,m.seal,'L','PORTDISC')) as "Local Port of Discharge"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SCHEDULED CONVOY') as "Scheduled Convoy"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SCHEDULED CONVOY DATE') as "Scheduled Convoy Date"
-       , nvl(strang.f_getLovColumn( 'UNCTNTAB', 'COLA', m.iso_container_type),m.iso_container_type) as "ISO Container Type"
-       , m.owner  "Container Owner"
-       , decode(m.iso_container_type,null,'BBULK','FCL') "Cargo"
-       , replace(strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION'),'"','') as "Description"
-       , round((nvl(m.vgm,(nvl(m.sumweight,0)+nvl(m.tare,0)))/1000),3) as "Gross Weight in Tonne"
-       , nvl(m.sumvolume,0) as "Cargo Volume"
-       , m.consignee||' '||strang.f_getlocdesc(m.consignee_location)||' '||strang.f_getlocdesc(m.warehouse_destination)||' '||m.warehouse_destination as "Consignee"
-       , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'HAZARDOUS') as "Hazardous Codes"
-       , 'BRISBANE' as "Controlling Office"
-       , strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION',m.complete) as "packing Status" 
+union ALL -- 4
+select p.po as "Purchase Order"
+       , p.po_item_no as "PO Item No"
+       , p.grn as "GRN"
+       , p.grn_item as "GRN Item"
+       , p.deliveryno as "Delivery No"
+       , p.recno as "PO Rno"
+       , strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION', m.complete) packing_status
+       , m.urgency  as "Priority"
+       , m.movement_type as "Movement Type"
+       , m.movement_no as "Container"
+       , m.seal as "Seal"
+       , case when m.io = 'I' then 'INBOUND' else 'OUTBOUND' end as "Direction"
+       , m.full_mt as "Full Or Empty"
+-------------------------------------------------------------------------------------           
+       , m.consignee as "Consignee"
+       , strang.f_getlovColumn('LOCATIONS','DESCRIPTION', m.consignee_location) as "Consignee Location"
+       , m.warehouse_destination as "Warehouse Destination"
+       , strang.f_getlovColumn('LOCATIONS','DESCRIPTION', m.current_location)  as "Current Location"
+       , m.customs_cleared_date as "Customs Cleared Date"
+       , m.local_bol as "Local BOL"
+       , m.bol as "Intl BOL"   
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIPNAME') as "Intl Ship Name"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL VOYAGE')  as "Intl Voyage"
+       , case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'eta') else null end as "Intl Est Arrival Date"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIPNAME') as "Local Ship Name"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL VOYAGE') as "Local Voyage"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL ESTARRIVE') as "Local Est Arrival Date"
+       , (select s3.convoyname from strang.convoy s3 where s3.convoy_id = m.convoy_id) as "Convoy Name"
+       , (select s3.convoy_type from strang.convoy s3 where s3.convoy_id  = m.convoy_id) as "Convoy Type"
+	   , (select s3.estdepart from strang.convoy s3 where s3.convoy_id  = m.convoy_id ) as "Convoy Depart Date"
+       , dr.hawb_hawbno as "Hawb Intl"
+       , dr.hawb_hawbno_2 as "Hawb Local"
+       , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
@@ -730,57 +523,42 @@ c.customer_type = 'SUPPLIER' and
             where  dr.movement_no is not null
              and   dr2.deliveryno = dr.deliveryno
              and   dr2.itemno  = dr.itemno)          
-union ALL
-select  
- p.deliveryno as "Delivery No"
-,p.recno as "PO Rno"
-,p.po as "Purchase Order"
-,p.po_item_no as "PO Item No"
-,p.inventoryno as "Material No"
-,p.supinv as "Invoice"
-,p.sap_delno_qty as "Quantity"
-,p.sap_delno_unit as "Unit"
-,p.grn as "GRN"
-,p.off_site_receipt as "Receipted Date"
-,c.customer as "Vendor"
-,dr.logno as "Log No"
-,dr.itemno as "Delivery Item"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'WAREHOUSE_DESTINATION') as "Warehouse Destination"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'CURRENT_LOCATION') as "Current Location"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'URGENCY') as "Priority"
-,nvl(p.shipping_text,(decode(dr.sa,'S','Pack for Sea Freight','A','Pack for Air Freight'))) as "Mode"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'MOVEMENT_NO') as "Container"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SEAL') as Seal
-,nvl(to_char(dr.hawb_hawbno),' ') as HAWB 
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIP ID') as "Intl Ship ID"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIPNAME') as "Intl Ship/MAWB"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL VOYAGE') as "Intl Voyage"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'etd') else null end as "Intl ETD"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'eta') else null end as "Intl ETA"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'depart') else null end as "Intl Port of Loading"
-, case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'arrive') else null end as "Intl Port of Discharge"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'BOL') as "Intl Bol"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'CUSTOMS_CLEARED_DATE') as "Customs Cleared Date"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIP ID') as "Local Ship ID"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIPNAME') as "Local Ship"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL VOYAGE') as "Local Voyage"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL BOL') as "Local Bol"
-, strang.f_getshipfields_mv(m.movement_no,m.seal,'L','ESTDEPART') as "Local ETD" 
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL ESTARRIVE') as "Local ETA"
-,strang.f_getlocdesc(strang.f_getshipfields_mv(m.movement_no,m.seal,'L','PORTLOAD')) as "Local Port of Loading"
-,strang.f_getlocdesc(strang.f_getshipfields_mv(m.movement_no,m.seal,'L','PORTDISC')) as "Local Port of Discharge"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SCHEDULED CONVOY') as "Scheduled Convoy"
-,strang.f_get_info_for_po(p.deliveryno,dr.itemno,'SCHEDULED CONVOY DATE') as "Scheduled Convoy Date"
-,nvl(strang.f_getLovColumn( 'UNCTNTAB', 'COLA', m.iso_container_type),m.iso_container_type) as "ISO Container Type"
-,m.owner  "Container Owner"
-,decode(m.iso_container_type,null,'BBULK','FCL') "Cargo"
-,strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') as "Description"
-,round((nvl(m.vgm,(nvl(m.sumweight,0)+nvl(m.tare,0)))/1000),3) as "Gross Weight in Tonne"
-,nvl(m.sumvolume,0) as "Cargo Volume"
-,m.consignee||' '||strang.f_getlocdesc(m.consignee_location)||' '||strang.f_getlocdesc(m.warehouse_destination)||' '||m.warehouse_destination as "Consignee"
-,strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'HAZARDOUS') as "Hazardous Codes"
-,NVL( (SELECT COLC from strang.lov where lov_name='LOCATIONS' and code = m.current_location) , 'UNKNOWN') as "Controlling Office"
-,strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION',m.complete) as "packing Status" 
+union ALL  -- 5
+select p.po as "Purchase Order"
+       , p.po_item_no as "PO Item No"
+       , p.grn as "GRN"
+       , p.grn_item as "GRN Item"
+       , p.deliveryno as "Delivery No"
+       , p.recno as "PO Rno"
+       , strang.f_getlovColumn('MOVEMENT_STATUS','DESCRIPTION', m.complete) packing_status
+       , m.urgency  as "Priority"
+       , m.movement_type as "Movement Type"
+       , m.movement_no as "Container"
+       , m.seal as "Seal"
+       , case when m.io = 'I' then 'INBOUND' else 'OUTBOUND' end as "Direction"
+       , m.full_mt as "Full Or Empty"
+-------------------------------------------------------------------------------------           
+       , m.consignee as "Consignee"
+       , strang.f_getlovColumn('LOCATIONS','DESCRIPTION', m.consignee_location) as "Consignee Location"
+       , m.warehouse_destination as "Warehouse Destination"
+       , strang.f_getlovColumn('LOCATIONS','DESCRIPTION', m.current_location)  as "Current Location"
+       , m.customs_cleared_date as "Customs Cleared Date"
+       , m.local_bol as "Local BOL"
+       , m.bol as "Intl BOL"
+ -------------------------------------------------------------------------------------        
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL SHIPNAME') as "Intl Ship Name"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'INTL VOYAGE')  as "Intl Voyage"
+       , case when dr.sa = 'S' then stx1.f_getshipdetails_new(p.deliveryno,dr.itemno,'I',section=>'eta') else null end as "Intl Est Arrival Date"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL SHIPNAME') as "Local Ship Name"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL VOYAGE') as "Local Voyage"
+       , strang.f_get_info_for_po(p.deliveryno,dr.itemno,'LOCAL ESTARRIVE') as "Local Est Arrival Date"
+       , (select s3.convoyname from strang.convoy s3 where s3.convoy_id = m.convoy_id) as "Convoy Name"
+       , (select s3.convoy_type from strang.convoy s3 where s3.convoy_id  = m.convoy_id) as "Convoy Type"
+	   , (select s3.estdepart from strang.convoy s3 where s3.convoy_id  = m.convoy_id ) as "Convoy Depart Date"
+ -------------------------------------------------------------------------------
+       , dr.hawb_hawbno as "Hawb Intl"
+       , dr.hawb_hawbno_2 as "Hawb Local"
+       , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
 from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
@@ -798,7 +576,7 @@ m.current_location in (select code from strang.lov where lov_name='LOCATIONS' an
 --dr.DELIVERYNO between 9000000 and 9999999 ) and
 --p.grn_status in (1,8,9) and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
-r.currdate >  sysdate - 700 and 
+r.currdate >  sysdate - 720 and 
 c.customer_type = 'SUPPLIER' and 
  exists (select 1
              from  strang.detailrs dr2
@@ -877,43 +655,21 @@ begin
  close c3;
  -- f := utl_file.fopen( glbx.extract_master_parameter('MAIL_TEMPLATE_DIR'), 'OST185_' || to_char(sysdate, 'dd_mon_yyyy_hh24mi') || '.csv', 'w', 32767);
  f := utl_file.fopen( f_dir, f_file, 'w', 32767);
-
- -- Output Header
- --utl_file.put_line(f, buffer=>'H,' || to_char(sysdate,'DD.MM.YYYY') || ',' || tot );
---  utl_file.put_line(f, buffer=>'Delivery No,PO Rno,Purchase Order,PO Item No,Material No,Invoice,Quantity,Unit,GRN,Receipted Date,'||
---                                'Vendor,Log No,Delivery Item,Warehouse Destination,Current Location,Priority,Mode,Container,Seal,HAWB,'||
---                                'Intl Ship ID,Intl Ship/MAWB,Intl Voyage,Intl Line No,Intl ETA,Intl Bol,Customs Cleared Date,Local Ship ID,'||
---                                'Local Ship,Local Voyage,Local Line No,Local Bol,Local ETA,Scheduled Convoy,Scheduled Convoy Date');
-                                
-                                
-  utl_file.put_line(f, buffer=>'"Delivery No","PO Rno","Purchase Order","PO Item No","Material No","Invoice","Quantity","Unit","GRN","Receipted Date","Vendor","Log No","Delivery Item","'||
-                               'Warehouse Destination","Current Location","Priority","Mode","Container","Seal","HAWB","Intl Ship ID","Intl Ship/MAWB"," Intl Voyage","'||
-                               'Intl ETD","Intl ETA","Intl Port of Loading","Intl Port of Discharge","Intl Bol","Customs Cleared Date","Local Ship ID","Local Ship","'||
-                               'Local Voyage","Local Bol","Local ETD","Local ETA","Local Port of Loading","Local Port of Discharge","Scheduled Convoy","Scheduled Convoy Date","'||
-                               'ISO Container Type","Container Owner","Cargo","Description","Gross Weight in Tonne","Cargo Volume"," Consignee"," Hazardous Codes","'||
-                               'Controlling Office","packing Status"');             
+                               
+  utl_file.put_line(f, buffer=>'"Purchase Order","PO Item No","GRN","GRN Item","Delivery No","PO Rno","Packing Status","Priority","Movement Type","Container"'||
+                               '"Seal","Direction","Full Or Empty","Consignee","Consignee Location","Warehouse Destination","Current Location","Customs Cleared Date"'||
+                               '"Local BOL","Intl BOL","Intl Ship Name","Intl Voyage","Intl Est Arrival Date","Local Ship Name","Local Voyage","Local Est Arrival Date"'||
+                               '"Convoy Name","Convoy Type","Convoy Depart Date","Hawb Intl","Hawb Local","Post Date"');     
 
  ctr := 0;
  for c1rec in c1 loop
---  utl_file.put_line(f, buffer=>c1rec."Delivery No"||','||c1rec."PO Rno"||','||c1rec."Purchase Order" ||','|| c1rec."PO Item No" || ',' || c1rec."Material No" || ','
---                        || c1rec."Invoice" || ',' || c1rec."Quantity" || ',' || c1rec."Unit" || ','||c1rec."GRN"||','||c1rec."Receipted Date"||',"'||c1rec."Vendor"|| '",'
---                        ||  c1rec."Log No" || ',' || c1rec."Delivery Item" || ',' || c1rec."Warehouse Destination" ||','|| c1rec."Current Location"||','|| c1rec."Priority" || ',' || c1rec."Mode" || ','
---                        || c1rec."Container" || ',' || c1rec."Seal" || ',' || c1rec."HAWB" ||','||c1rec."Intl Ship ID"||',' || c1rec."Intl Ship/MAWB" || ',' || c1rec."Intl Voyage" || ',' || c1rec."Intl Line No" || ',' || c1rec."Intl ETA"||','
---                        || c1rec."Intl Bol" || ',' || c1rec."Customs Cleared Date" || ','||c1rec."Local Ship ID"|| ',' || c1rec."Local Ship" || ','||c1rec."Local Voyage" ||',' || c1rec."Local Line No" || ',' || c1rec."Local Bol" || ',' || c1rec."Local ETA"||','
---                        || c1rec."Scheduled Convoy" || ',' || c1rec."Scheduled Convoy Date" 
---                        );
   
-  utl_file.put_line(f, buffer=>'"'||c1rec."Delivery No"||'","'||c1rec."PO Rno"||'","'||c1rec."Purchase Order" ||'","'|| c1rec."PO Item No" || '","' || c1rec."Material No"||'","'
-                        || c1rec."Invoice"||'","'||c1rec."Quantity"||'","'||c1rec."Unit"||'","'||c1rec."GRN"||'","'||c1rec."Receipted Date"||'","'||c1rec."Vendor"|| '","'
-                        || c1rec."Log No" ||'","'||c1rec."Delivery Item"||'","'||c1rec."Warehouse Destination"||'","'||c1rec."Current Location"||'","'||c1rec."Priority"||'","'||c1rec."Mode"||'","'
-                        || c1rec."Container"||'","'|| c1rec."Seal"||'","'||c1rec."HAWB"||'","'||c1rec."Intl Ship ID"||'","'||c1rec."Intl Ship/MAWB"||'","'||c1rec."Intl Voyage"||'","'||c1rec."Intl ETD"||'","'||c1rec."Intl ETA"||'","'
-                        || c1rec."Intl Port of Loading"||'","'||c1rec."Intl Port of Discharge"||'","'||c1rec."Intl Bol"||'","'||c1rec."Customs Cleared Date"||'","'||c1rec."Local Ship ID"||'","'||c1rec."Local Ship"||'","'
-                        || c1rec."Local Voyage"||'","'||c1rec."Local Bol"||'","'||c1rec."Local ETD"||'","'||c1rec."Local ETA"||'","'||c1rec."Local Port of Loading"||'","'||c1rec."Local Port of Discharge"||'","'
-                        || c1rec."Scheduled Convoy" || '","' || c1rec."Scheduled Convoy Date"|| '","' ||c1rec."ISO Container Type"||'","'||c1rec."Container Owner"|| '","' ||c1rec."Cargo"|| '","' 
-                        || c1rec."Description"||'","'||c1rec."Gross Weight in Tonne"||'","'||c1rec."Cargo Volume"||'","'||c1rec."Consignee"||'","'||c1rec."Hazardous Codes"||'","' 
-                        || c1rec."Controlling Office"||'","'||c1rec."packing Status"||'"'
-                        );
-                      
+  utl_file.put_line(f, buffer=>'"'||c1rec."Purchase Order"||'","'||c1rec."PO Item No"||'","'||c1rec."GRN" ||'","'|| c1rec."GRN Item" || '","' || c1rec."Delivery No"||'","'
+                        || c1rec."PO Rno"||'","'||c1rec."Packing Status"||'","'||c1rec."Movement Type"||'","'||c1rec."Container"||'","'||c1rec."Seal"||'","'||c1rec."Direction"|| '","'
+                        || c1rec."Full Or Empty" ||'","'||c1rec."Consignee"||'","'||c1rec."Consignee Location"||'","'||c1rec."Warehouse Destination"||'","'||c1rec."Current Location"||'","'||c1rec."Customs Cleared Date"||'","'
+                        || c1rec."Local BOL"||'","'|| c1rec."Intl BOL"||'","'||c1rec."Intl Ship Name"||'","'||c1rec."Intl Voyage"||'","'||c1rec."Intl Est Arrival Date"||'","'||c1rec."Local Ship Name"||'","'||c1rec."Local Voyage"||'","'||c1rec."Local Est Arrival Date"||'","'
+                        || c1rec."Convoy Name"||'","'||c1rec."Convoy Type"||'","'||c1rec."Convoy Depart Date"||'","'||c1rec."Hawb Intl"||'","'||c1rec."Hawb Local"||'","'||c1rec."Post Date"||'"');
+
                         
                         
 -- ****** TURNED OFF 20180530 *********  update strang.pos set off_site_receipt = sysdate where rowid = c1rec.rowid;
@@ -931,24 +687,12 @@ begin
  ------ CREATE EXTRACT ---------------------------------------------------------
   f2 := utl_file.fopen( f_dir, f_file2, 'w', 32767);  -- 
   utl_file.put_line(f2, buffer=>'H,' || to_char(sysdate,'DD.MM.YYYY') || ',' || tot );
---  utl_file.put_line(f2, buffer=>'Delivery No,PO Rno,Purchase Order,PO Item No,Material No,Invoice,Quantity,Unit,GRN,Receipted Date,'||
---                                'Vendor,Log No,Delivery Item,Warehouse Destination,Current Location,Priority,Mode,Container,Seal,HAWB,'||
---                                'Intl Ship ID,Intl Ship/MAWB,Intl Voyage,Intl Line No,Intl ETA,Intl Bol,Customs Cleared Date,Local Ship ID,'||
---                                'Local Ship,Local Voyage,Local Line No,Local Bol,Local ETA,Scheduled Convoy,Scheduled Convoy Date');
 
---  utl_file.put_line(f2, buffer=>'Delivery No,PO Rno,Purchase Order,PO Item No, Material No, Invoice, Quantity, Unit, GRN, Receipted Date, Vendor, Log No, Delivery Item,'||
---                               'Warehouse Destination,Current Location, Priority,Mode,Container,Seal,HAWB,Intl Ship ID, Intl Ship/MAWB, Intl Voyage, '||
---                               'Intl ETD, Intl ETA,Intl Port of Loading,Intl Port of Discharge,Intl Bol,Customs Cleared Date,Local Ship ID,Local Ship, '||
---                               'Local Voyage,Local Bol,Local ETD,Local ETA,Local Port of Loading,Local Port of Discharge,Scheduled Convoy,Scheduled Convoy Date, '||
---                               'ISO Container Type,Container Owner,Cargo,Description,Gross Weight in Tonne,Cargo Volume, Consignee, Hazardous Codes, '||
---                               'Controlling Office, packing Status');        
-
-   utl_file.put_line(f2, buffer=>'"Delivery No","PO Rno","Purchase Order","PO Item No","Material No","Invoice","Quantity","Unit","GRN","Receipted Date","Vendor","Log No","Delivery Item","'||
-                               'Warehouse Destination","Current Location","Priority","Mode","Container","Seal","HAWB","Intl Ship ID","Intl Ship/MAWB"," Intl Voyage","'||
-                               'Intl ETD"," Intl ETA","Intl Port of Loading","Intl Port of Discharge","Intl Bol","Customs Cleared Date","Local Ship ID","Local Ship","'||
-                               'Local Voyage","Local Bol","Local ETD","Local ETA","Local Port of Loading","Local Port of Discharge","Scheduled Convoy","Scheduled Convoy Date","'||
-                               'ISO Container Type","Container Owner","Cargo","Description","Gross Weight in Tonne","Cargo Volume"," Consignee"," Hazardous Codes","'||
-                               'Controlling Office","packing Status"');     
+  utl_file.put_line(f2, buffer=>'"Purchase Order","PO Item No","GRN","GRN Item","Delivery No","PO Rno","Packing Status","Priority","Movement Type","Container"'||
+                               '"Seal","Direction","Full Or Empty","Consignee","Consignee Location","Warehouse Destination","Current Location","Customs Cleared Date"'||
+                               '"Local BOL","Intl BOL","Intl Ship Name","Intl Voyage","Intl Est Arrival Date","Local Ship Name","Local Voyage","Local Est Arrival Date"'||
+                               '"Convoy Name","Convoy Type","Convoy Depart Date","Hawb Intl","Hawb Local","Post Date"');     
+  
 
   ctr1 := 0;
   for c1rec in c1 loop
@@ -959,27 +703,14 @@ begin
 --                        || c1rec."Intl Bol" || ',' || c1rec."Customs Cleared Date" || ','||c1rec."Local Ship ID"||',' || c1rec."Local Ship" || ','||c1rec."Local Voyage" ||',' || c1rec."Local Line No" || ',' || c1rec."Local Bol" || ',' || c1rec."Local ETA"||','
 --                        || c1rec."Scheduled Convoy" || ',' || c1rec."Scheduled Convoy Date" 
 --                        );
-                        
--- utl_file.put_line(f2, buffer=>c1rec."Delivery No"||'|'||c1rec."PO Rno"||'|'||c1rec."Purchase Order" ||'|'|| c1rec."PO Item No" || '|' || c1rec."Material No" || '|'
---                        || c1rec."Invoice" || '|' || c1rec."Quantity" || '|' || c1rec."Unit" || '|'||c1rec."GRN"||'|'||c1rec."Receipted Date"||'|"'||c1rec."Vendor"|| '"|'
---                        ||  c1rec."Log No" || '|' || c1rec."Delivery Item" || '|' || c1rec."Warehouse Destination" ||'|'|| c1rec."Current Location"||'|'|| c1rec."Priority" || '|' || c1rec."Mode" || '|'
---                        || c1rec."Container" || '|' || c1rec."Seal" || '|' || c1rec."HAWB" ||'|'||c1rec."Intl Ship ID"||'|' || c1rec."Intl Ship/MAWB" || '|' || c1rec."Intl Voyage" ||'|'|| c1rec."Intl ETD"||'|'|| c1rec."Intl ETA"||'|'
---                        || c1rec."Intl Port of Loading"||'|'||c1rec."Intl Port of Discharge"||'|'||c1rec."Intl Bol"||'|'||c1rec."Customs Cleared Date"||'|'||c1rec."Local Ship ID"||'|'||c1rec."Local Ship"||'|'
---                        || c1rec."Local Voyage"||'|'||c1rec."Local Bol"||'|'||c1rec."Local ETD"||'|'||c1rec."Local ETA"||'|'||c1rec."Local Port of Loading"||'|'||c1rec."Local Port of Discharge"||'|'
---                        || c1rec."Scheduled Convoy" ||'|' || c1rec."Scheduled Convoy Date"|| '|' ||c1rec."ISO Container Type"|| '|"' ||c1rec."Container Owner"|| '"|' 
---                        ||c1rec."Cargo"||'|"'|| c1rec."Description" || '"|' ||c1rec."Gross Weight in Tonne" || '|' ||c1rec."Cargo Volume" ||'|"' ||c1rec."Consignee" || '"|"' ||c1rec."Hazardous Codes" || '"|' 
---                        || c1rec."Controlling Office" ||'|'||c1rec."packing Status"
---                        );    
-   utl_file.put_line(f2, buffer=>'"'||c1rec."Delivery No"||'","'||c1rec."PO Rno"||'","'||c1rec."Purchase Order" ||'","'|| c1rec."PO Item No" || '","' || c1rec."Material No"||'","'
-                        || c1rec."Invoice"||'","'||c1rec."Quantity"||'","'||c1rec."Unit"||'","'||c1rec."GRN"||'","'||c1rec."Receipted Date"||'","'||c1rec."Vendor"|| '","'
-                        || c1rec."Log No" ||'","'||c1rec."Delivery Item"||'","'||c1rec."Warehouse Destination"||'","'||c1rec."Current Location"||'","'||c1rec."Priority"||'","'||c1rec."Mode"||'","'
-                        || c1rec."Container"||'","'|| c1rec."Seal"||'","'||c1rec."HAWB"||'","'||c1rec."Intl Ship ID"||'","'||c1rec."Intl Ship/MAWB"||'","'||c1rec."Intl Voyage"||'","'||c1rec."Intl ETD"||'","'||c1rec."Intl ETA"||'","'
-                        || c1rec."Intl Port of Loading"||'","'||c1rec."Intl Port of Discharge"||'","'||c1rec."Intl Bol"||'","'||c1rec."Customs Cleared Date"||'","'||c1rec."Local Ship ID"||'","'||c1rec."Local Ship"||'","'
-                        || c1rec."Local Voyage"||'","'||c1rec."Local Bol"||'","'||c1rec."Local ETD"||'","'||c1rec."Local ETA"||'","'||c1rec."Local Port of Loading"||'","'||c1rec."Local Port of Discharge"||'","'
-                        || c1rec."Scheduled Convoy" || '","' || c1rec."Scheduled Convoy Date"|| '","' ||c1rec."ISO Container Type"||'","'||c1rec."Container Owner"|| '","' ||c1rec."Cargo"|| '","' 
-                        || c1rec."Description"||'","'||c1rec."Gross Weight in Tonne"||'","'||c1rec."Cargo Volume"||'","'||c1rec."Consignee"||'","'||c1rec."Hazardous Codes"||'","' 
-                        || c1rec."Controlling Office"||'","'||c1rec."packing Status"||'"'
-                        );                 
+
+  utl_file.put_line(f2, buffer=>'"'||c1rec."Purchase Order"||'","'||c1rec."PO Item No"||'","'||c1rec."GRN" ||'","'|| c1rec."GRN Item" || '","' || c1rec."Delivery No"||'","'
+                        || c1rec."PO Rno"||'","'||c1rec."Packing Status"||'","'||c1rec."Movement Type"||'","'||c1rec."Container"||'","'||c1rec."Seal"||'","'||c1rec."Direction"|| '","'
+                        || c1rec."Full Or Empty" ||'","'||c1rec."Consignee"||'","'||c1rec."Consignee Location"||'","'||c1rec."Warehouse Destination"||'","'||c1rec."Current Location"||'","'||c1rec."Customs Cleared Date"||'","'
+                        || c1rec."Local BOL"||'","'|| c1rec."Intl BOL"||'","'||c1rec."Intl Ship Name"||'","'||c1rec."Intl Voyage"||'","'||c1rec."Intl Est Arrival Date"||'","'||c1rec."Local Ship Name"||'","'||c1rec."Local Voyage"||'","'||c1rec."Local Est Arrival Date"||'","'
+                        || c1rec."Convoy Name"||'","'||c1rec."Convoy Type"||'","'||c1rec."Convoy Depart Date"||'","'||c1rec."Hawb Intl"||'","'||c1rec."Hawb Local"||'","'||c1rec."Post Date"||'"');
+  
+              
    
 -- ****** TURNED OFF 20180530 *********  update strang.pos set off_site_receipt = sysdate where rowid = c1rec.rowid;
 --  update strang.pos set po_waybill_type = c1rec.po_waybill_type where rowid = c1rec.rowid;
