@@ -656,18 +656,19 @@ begin
  -- f := utl_file.fopen( glbx.extract_master_parameter('MAIL_TEMPLATE_DIR'), 'OST185_' || to_char(sysdate, 'dd_mon_yyyy_hh24mi') || '.csv', 'w', 32767);
  f := utl_file.fopen( f_dir, f_file, 'w', 32767);
                                
-  utl_file.put_line(f, buffer=>'"Purchase Order","PO Item No","GRN","GRN Item","Delivery No","PO Rno","Packing Status","Priority","Movement Type","Container"'||
-                               '"Seal","Direction","Full Or Empty","Consignee","Consignee Location","Warehouse Destination","Current Location","Customs Cleared Date"'||
-                               '"Local BOL","Intl BOL","Intl Ship Name","Intl Voyage","Intl Est Arrival Date","Local Ship Name","Local Voyage","Local Est Arrival Date"'||
+  utl_file.put_line(f, buffer=>'"Purchase Order","PO Item No","GRN","GRN Item","Delivery No","PO Rno","Packing Status","Priority","Movement Type","Container","'||
+                               '"Seal","Direction","Full Or Empty","Consignee","Consignee Location","Warehouse Destination","Current Location","Customs Cleared Date","'||
+                               '"Local BOL","Intl BOL","Intl Ship Name","Intl Voyage","Intl Est Arrival Date","Local Ship Name","Local Voyage","Local Est Arrival Date","'||
                                '"Convoy Name","Convoy Type","Convoy Depart Date","Hawb Intl","Hawb Local","Post Date"');     
-
+--32
  ctr := 0;
  for c1rec in c1 loop
   
   utl_file.put_line(f, buffer=>'"'||c1rec."Purchase Order"||'","'||c1rec."PO Item No"||'","'||c1rec."GRN" ||'","'|| c1rec."GRN Item" || '","' || c1rec."Delivery No"||'","'
-                        || c1rec."PO Rno"||'","'||c1rec."Packing Status"||'","'||c1rec."Movement Type"||'","'||c1rec."Container"||'","'||c1rec."Seal"||'","'||c1rec."Direction"|| '","'
+                        || c1rec."PO Rno"||'","'||c1rec."Packing Status"||'","'||c1rec."Priority"||'","'||c1rec."Movement Type"||'","'||c1rec."Container"||'","'||c1rec."Seal"||'","'||c1rec."Direction"|| '","'
                         || c1rec."Full Or Empty" ||'","'||c1rec."Consignee"||'","'||c1rec."Consignee Location"||'","'||c1rec."Warehouse Destination"||'","'||c1rec."Current Location"||'","'||c1rec."Customs Cleared Date"||'","'
-                        || c1rec."Local BOL"||'","'|| c1rec."Intl BOL"||'","'||c1rec."Intl Ship Name"||'","'||c1rec."Intl Voyage"||'","'||c1rec."Intl Est Arrival Date"||'","'||c1rec."Local Ship Name"||'","'||c1rec."Local Voyage"||'","'||c1rec."Local Est Arrival Date"||'","'
+                        || c1rec."Local BOL"||'","'|| c1rec."Intl BOL"||'","'||c1rec."Intl Ship Name"||'","'||c1rec."Intl Voyage"||'","'||c1rec."Intl Est Arrival Date"||'","'||c1rec."Local Ship Name"||'","'
+                        || c1rec."Local Voyage"||'","'||c1rec."Local Est Arrival Date"||'","'
                         || c1rec."Convoy Name"||'","'||c1rec."Convoy Type"||'","'||c1rec."Convoy Depart Date"||'","'||c1rec."Hawb Intl"||'","'||c1rec."Hawb Local"||'","'||c1rec."Post Date"||'"');
 
                         
@@ -688,9 +689,9 @@ begin
   f2 := utl_file.fopen( f_dir, f_file2, 'w', 32767);  -- 
   utl_file.put_line(f2, buffer=>'H,' || to_char(sysdate,'DD.MM.YYYY') || ',' || tot );
 
-  utl_file.put_line(f2, buffer=>'"Purchase Order","PO Item No","GRN","GRN Item","Delivery No","PO Rno","Packing Status","Priority","Movement Type","Container"'||
-                               '"Seal","Direction","Full Or Empty","Consignee","Consignee Location","Warehouse Destination","Current Location","Customs Cleared Date"'||
-                               '"Local BOL","Intl BOL","Intl Ship Name","Intl Voyage","Intl Est Arrival Date","Local Ship Name","Local Voyage","Local Est Arrival Date"'||
+  utl_file.put_line(f2, buffer=>'"Purchase Order","PO Item No","GRN","GRN Item","Delivery No","PO Rno","Packing Status","Priority","Movement Type","Container","'||
+                               '"Seal","Direction","Full Or Empty","Consignee","Consignee Location","Warehouse Destination","Current Location","Customs Cleared Date","'||
+                               '"Local BOL","Intl BOL","Intl Ship Name","Intl Voyage","Intl Est Arrival Date","Local Ship Name","Local Voyage","Local Est Arrival Date","'||
                                '"Convoy Name","Convoy Type","Convoy Depart Date","Hawb Intl","Hawb Local","Post Date"');     
   
 
@@ -705,9 +706,10 @@ begin
 --                        );
 
   utl_file.put_line(f2, buffer=>'"'||c1rec."Purchase Order"||'","'||c1rec."PO Item No"||'","'||c1rec."GRN" ||'","'|| c1rec."GRN Item" || '","' || c1rec."Delivery No"||'","'
-                        || c1rec."PO Rno"||'","'||c1rec."Packing Status"||'","'||c1rec."Movement Type"||'","'||c1rec."Container"||'","'||c1rec."Seal"||'","'||c1rec."Direction"|| '","'
+                        || c1rec."PO Rno"||'","'||c1rec."Packing Status"||'","'||c1rec."Priority"||'","'||c1rec."Movement Type"||'","'||c1rec."Container"||'","'||c1rec."Seal"||'","'||c1rec."Direction"|| '","'
                         || c1rec."Full Or Empty" ||'","'||c1rec."Consignee"||'","'||c1rec."Consignee Location"||'","'||c1rec."Warehouse Destination"||'","'||c1rec."Current Location"||'","'||c1rec."Customs Cleared Date"||'","'
-                        || c1rec."Local BOL"||'","'|| c1rec."Intl BOL"||'","'||c1rec."Intl Ship Name"||'","'||c1rec."Intl Voyage"||'","'||c1rec."Intl Est Arrival Date"||'","'||c1rec."Local Ship Name"||'","'||c1rec."Local Voyage"||'","'||c1rec."Local Est Arrival Date"||'","'
+                        || c1rec."Local BOL"||'","'|| c1rec."Intl BOL"||'","'||c1rec."Intl Ship Name"||'","'||c1rec."Intl Voyage"||'","'||c1rec."Intl Est Arrival Date"||'","'||c1rec."Local Ship Name"||'","'
+                        || c1rec."Local Voyage"||'","'||c1rec."Local Est Arrival Date"||'","'
                         || c1rec."Convoy Name"||'","'||c1rec."Convoy Type"||'","'||c1rec."Convoy Depart Date"||'","'||c1rec."Hawb Intl"||'","'||c1rec."Hawb Local"||'","'||c1rec."Post Date"||'"');
   
               
