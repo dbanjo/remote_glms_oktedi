@@ -28558,7 +28558,7 @@ begin
   then
    -- glbx.send( gcode, gparam, 'OST185_' || to_char(sysdate, 'dd_mon_yyyy_hh24mi') || '.csv', p_to=>eml, p_subj=>'OST185_' || c3rec.v1date || '_' || to_char(sysdate, 'hh24mi'), p_from=>glbx.extract_master_parameter('MAIL_FROM'),is_attachment=>TRUE);
   -- glbx.send( gcode, gparam, f_file, p_to=>eml, p_subj=>'OST185_' || c3rec.v1date || '_' || to_char(sysdate, 'hh24mi'), p_from=>glbx.extract_master_parameter('MAIL_FROM'),is_attachment=>TRUE 
-   glbx.send( gcode, gparam, f_file2, p_to=>eml, p_subj=>'RECEIPTED_PO_EXTRACT_' || c3rec.v1date || '_' || to_char(sysdate, 'hh24mi'), p_from=>glbx.extract_master_parameter('MAIL_FROM'),is_attachment=>TRUE);
+   glbx.send( gcode, gparam, f_file2, p_to=>eml, p_subj=>'Prod RECEIPTED_PO_EXTRACT_' || c3rec.v1date || '_' || to_char(sysdate, 'hh24mi'), p_from=>glbx.extract_master_parameter('MAIL_FROM'),is_attachment=>TRUE);
    ftp_ost_185(f_dir || '\' || f_file, 'SFTP');
  else
    begin
