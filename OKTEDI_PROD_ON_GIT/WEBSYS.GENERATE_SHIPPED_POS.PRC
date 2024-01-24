@@ -665,9 +665,9 @@ begin
  -- f := utl_file.fopen( glbx.extract_master_parameter('MAIL_TEMPLATE_DIR'), 'OST185_' || to_char(sysdate, 'dd_mon_yyyy_hh24mi') || '.csv', 'w', 32767);
  f := utl_file.fopen( f_dir, f_file, 'w', 32767);
                                
-  utl_file.put_line(f, buffer=>'"Purchase Order","PO Item No","GRN","GRN Item","Delivery No","PO Rno","Packing Status","Priority","Movement Type","Container","'||
-                               '"Seal","Direction","Full Or Empty","Consignee","Consignee Location","Warehouse Destination","Current Location","Customs Cleared Date","'||
-                               '"Local BOL","Intl BOL","Intl Ship Name","Intl Voyage","Intl Est Arrival Date","Local Ship Name","Local Voyage","Local Est Arrival Date","'||
+  utl_file.put_line(f, buffer=>'"Purchase Order","PO Item No","GRN","GRN Item","Delivery No","PO Rno","Packing Status","Priority","Movement Type","Container",'||
+                               '"Seal","Direction","Full Or Empty","Consignee","Consignee Location","Warehouse Destination","Current Location","Customs Cleared Date",'||
+                               '"Local BOL","Intl BOL","Intl Ship Name","Intl Voyage","Intl Est Arrival Date","Local Ship Name","Local Voyage","Local Est Arrival Date",'||
                                '"Convoy Name","Convoy Type","Convoy Depart Date","Hawb Intl","Hawb Local","Post Date"');     
 --32
  ctr := 0;
@@ -698,9 +698,9 @@ begin
   f2 := utl_file.fopen( f_dir, f_file2, 'w', 32767);  -- 
   utl_file.put_line(f2, buffer=>'H,' || to_char(sysdate,'DD.MM.YYYY') || ',' || tot );
 
-  utl_file.put_line(f2, buffer=>'"Purchase Order","PO Item No","GRN","GRN Item","Delivery No","PO Rno","Packing Status","Priority","Movement Type","Container","'||
-                               '"Seal","Direction","Full Or Empty","Consignee","Consignee Location","Warehouse Destination","Current Location","Customs Cleared Date","'||
-                               '"Local BOL","Intl BOL","Intl Ship Name","Intl Voyage","Intl Est Arrival Date","Local Ship Name","Local Voyage","Local Est Arrival Date","'||
+  utl_file.put_line(f2, buffer=>'"Purchase Order","PO Item No","GRN","GRN Item","Delivery No","PO Rno","Packing Status","Priority","Movement Type","Container",'||
+                               '"Seal","Direction","Full Or Empty","Consignee","Consignee Location","Warehouse Destination","Current Location","Customs Cleared Date",'||
+                               '"Local BOL","Intl BOL","Intl Ship Name","Intl Voyage","Intl Est Arrival Date","Local Ship Name","Local Voyage","Local Est Arrival Date",'||
                                '"Convoy Name","Convoy Type","Convoy Depart Date","Hawb Intl","Hawb Local","Post Date"');     
   
 
