@@ -14,18 +14,18 @@ LOB (VALUE_LARGE) STORE AS SECUREFILE L_VALUE_LARGE (
   TABLESPACE  PICTION_MED_1
   ENABLE      STORAGE IN ROW
   CHUNK       16384
+  RETENTION
   CACHE
   LOGGING
-      STORAGE    (
-                  INITIAL          10M
-                  NEXT             10M
-                  MINEXTENTS       1
-                  MAXEXTENTS       UNLIMITED
-                  PCTINCREASE      0
-                  BUFFER_POOL      DEFAULT
-                 ))
+  STORAGE    (
+              INITIAL          10M
+              NEXT             10M
+              MINEXTENTS       1
+              MAXEXTENTS       UNLIMITED
+              PCTINCREASE      0
+              BUFFER_POOL      DEFAULT
+             ))
 TABLESPACE PICTION_MED_1
-PCTUSED    0
 PCTFREE    0
 INITRANS   1
 MAXTRANS   255
