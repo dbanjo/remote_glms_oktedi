@@ -29390,7 +29390,8 @@ begin
    close c2;
  end if;
 
- if action not in ( 'Delete', 'Insert New Convoy as a Copy')
+ --if action not in ( 'Delete', 'Insert New Convoy as a Copy') -- removed by DB on 5/2/24
+ if action in ('Update')
   then
    for j in p1.first..p1.last loop
     begin
