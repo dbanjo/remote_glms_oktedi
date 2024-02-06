@@ -9,7 +9,7 @@ as -- version 1.0  -- added by DBanjo
 
  version		constant	  varchar2(20) := '1.0.0E';
  err_found	    			  boolean;
- g_another_test            varchar2(100);
+ g_another_test               varchar2(100);
  g_request				      varchar2(100);
  g_name					      varchar2(100) := 'STRANG_POSPUSH_';
  g_digest_un				  varchar2(100) := 'GLMS_SERVICE';
@@ -8883,4 +8883,5 @@ https://glms.stxgroup.com.au:4430/sws/trace
 */
 
 end strangw;
+
 /
