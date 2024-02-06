@@ -1,9 +1,0 @@
-CREATE OR REPLACE FORCE VIEW STRANG.STRANG_INVENTORY
-(INVENTORY, DESCRIPTION, TARIFF)
-AS 
-select code inventory, description, cola tariff
-from lov
-where lov_name = 'INVENT';
-
-
-GRANT SELECT ON STRANG.STRANG_INVENTORY TO WEBSYS;
