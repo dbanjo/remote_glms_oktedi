@@ -11,6 +11,7 @@ as
    0.1        07/01/2021      dbanjo       1. Billing Year threshold increased from 2020 to 2040 (as requested by Sallie Strang)
    0.2        01/03/2021      dbanjo       2. Updated movements procedure to handle new AIRWAY entry - default settings.
    0.3        01/03/2021      dbanjo       3. Updated websys.oltp_overview table to switch of southbound menu items.
+   0.4        06/02/2024      dbanjo       4. github check. David Banjo
 ******************************************************************************/
   function currsite return varchar2;
   function new_log_no( p1 in varchar2, vste in varchar2, io varchar2 default 'I' ) return varchar2;
