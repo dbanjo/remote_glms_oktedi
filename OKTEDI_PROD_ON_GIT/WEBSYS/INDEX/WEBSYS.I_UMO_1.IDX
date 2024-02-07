@@ -1,0 +1,17 @@
+DROP INDEX WEBSYS.I_UMO_1;
+
+CREATE INDEX WEBSYS.I_UMO_1 ON WEBSYS.UMO
+(UMO_ID, AID, UMO_SCENE_ID)
+LOGGING
+TABLESPACE PICTION_MED_1
+PCTFREE    0
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          2M
+            NEXT             256K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           );

@@ -1,0 +1,98 @@
+DROP TABLE WEBSYS.HEALTH_GROUP CASCADE CONSTRAINTS;
+
+CREATE TABLE WEBSYS.HEALTH_GROUP
+(
+  CATEGORY    VARCHAR2(40 BYTE),
+  GROUP_NAME  VARCHAR2(80 BYTE),
+  CODE        VARCHAR2(4 BYTE),
+  ORDER_BY    NUMBER(10)
+)
+TABLESPACE PICTION_MED_1
+PCTFREE    0
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          32K
+            NEXT             32K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE;
+
+COMMENT ON TABLE WEBSYS.HEALTH_GROUP IS 'List of groups of Questions.';
+
+COMMENT ON COLUMN WEBSYS.HEALTH_GROUP.CATEGORY IS 'High level Health Check Question Category.';
+
+COMMENT ON COLUMN WEBSYS.HEALTH_GROUP.GROUP_NAME IS 'A set of questions belong to this group.';
+
+COMMENT ON COLUMN WEBSYS.HEALTH_GROUP.CODE IS 'A four character (Format-AA) code used to identify the group. A two digit number is appended to the code.';
+
+COMMENT ON COLUMN WEBSYS.HEALTH_GROUP.ORDER_BY IS 'Used to order the questions when displaying.';
+
+
+ALTER TABLE WEBSYS.HEALTH_GROUP ADD (
+  PRIMARY KEY
+  (GROUP_NAME)
+  USING INDEX
+    TABLESPACE PICTION_MED_1
+    PCTFREE    10
+    INITRANS   2
+    MAXTRANS   255
+    STORAGE    (
+                INITIAL          32K
+                NEXT             32K
+                MINEXTENTS       1
+                MAXEXTENTS       UNLIMITED
+                PCTINCREASE      0
+                BUFFER_POOL      DEFAULT
+               )
+  ENABLE VALIDATE
+,  UNIQUE (CODE)
+  USING INDEX
+    TABLESPACE PICTION_MED_1
+    PCTFREE    10
+    INITRANS   2
+    MAXTRANS   255
+    STORAGE    (
+                INITIAL          32K
+                NEXT             32K
+                MINEXTENTS       1
+                MAXEXTENTS       UNLIMITED
+                PCTINCREASE      0
+                BUFFER_POOL      DEFAULT
+               )
+  ENABLE VALIDATE);
+
+
+--  There is no statement for index WEBSYS.SYS_C007240.
+--  The object is created when the parent object is created.
+
+--  There is no statement for index WEBSYS.SYS_C007241.
+--  The object is created when the parent object is created.
+
+CREATE OR REPLACE TRIGGER WEBSYS.T_HEALTH_GROUP_1 
+ BEFORE INSERT OR UPDATE
+ ON WEBSYS.HEALTH_GROUP
+ FOR EACH ROW
+DECLARE
+ cursor c1(vl varchar2) is select 'x' from lov where lov_type = 'CATEGORY' and lov_value = vl;
+ tmp 	char(1);
+BEGIN
+
+ if (inserting or updating)
+  then
+   tmp := NULL;
+   open c1( :NEW.CATEGORY );
+   fetch c1 into tmp;
+   close c1;
+   if tmp is null
+    then
+     raise_application_error(-20203,'Category: ' || :NEW.CATEGORY || ' does not exist.' );
+   end if;
+ end if;
+END T_HEALTH_GROUP_1;
+/

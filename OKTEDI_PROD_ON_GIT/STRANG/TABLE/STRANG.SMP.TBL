@@ -1,0 +1,111 @@
+DROP TABLE STRANG.SMP CASCADE CONSTRAINTS;
+
+CREATE TABLE STRANG.SMP
+(
+  SMP_NO                  VARCHAR2(100 BYTE)    NOT NULL,
+  SMP_ID                  NUMBER,
+  DESCRIPTION             VARCHAR2(100 BYTE),
+  DATE_MODIFIED           DATE,
+  URGENCY                 VARCHAR2(100 BYTE),
+  IO                      CHAR(1 BYTE),
+  OWNER                   VARCHAR2(20 BYTE),
+  CLIENT_ID               NUMBER,
+  CLIENT_LOCATION         VARCHAR2(50 BYTE),
+  REMARKS                 VARCHAR2(2000 BYTE),
+  SMP_WEIGHT_KGS          NUMBER,
+  SMP_INITIAL_WGT_IN_KGS  NUMBER,
+  HAZARDOUS_GOODS         CHAR(1 BYTE),
+  HAZARDOUS_DESC          VARCHAR2(200 BYTE),
+  CURRENT_LOCATION        VARCHAR2(30 BYTE),
+  WAREHOUSE_DESTINATION   VARCHAR2(20 BYTE),
+  PORTLOAD                VARCHAR2(30 BYTE),
+  PORTDISC                VARCHAR2(30 BYTE),
+  MOVEMENT_NO             VARCHAR2(40 BYTE),
+  SEAL                    VARCHAR2(20 BYTE),
+  SMP_TYPE                VARCHAR2(50 BYTE),
+  CURRDATE                TIMESTAMP(6),
+  COMPLETE                VARCHAR2(50 BYTE),
+  SUMWEIGHT               NUMBER,
+  SUMVOLUME               NUMBER,
+  GROSSWEIGHT             NUMBER,
+  TARE                    NUMBER,
+  SA                      CHAR(1 BYTE)          NOT NULL,
+  HAZARD_CLASS            VARCHAR2(20 BYTE),
+  LOCATION_IN_WAREHOUSE   VARCHAR2(50 BYTE),
+  CREATED_BY              VARCHAR2(20 BYTE),
+  MODIFIED_BY             VARCHAR2(20 BYTE),
+  MODIFIED_DATE           TIMESTAMP(6),
+  CHARGEWEIGHT            NUMBER(15),
+  COMPLETION_DATE         DATE,
+  CONTAINERISED_DATE      DATE,
+  PACKED_BY               VARCHAR2(20 BYTE),
+  PACKED_DATE             DATE,
+  REVTON                  NUMBER(15,3),
+  SCAN_KEY                NUMBER(20),
+  SMP_HEIGHT_IN_CMTRS     NUMBER,
+  SMP_LENGTH_IN_CMTRS     NUMBER,
+  SMP_VOLUME_IN_MTRS      NUMBER(15,3),
+  SMP_WIDTH_IN_CMTRS      NUMBER,
+  RECEIVING_WAREHOUSE     VARCHAR2(20 BYTE),
+  UNPACKED_BY             VARCHAR2(20 BYTE),
+  UNPACKED_DATE           DATE,
+  UNPACKED_FLAG           VARCHAR2(3 BYTE)
+)
+TABLESPACE PICTION_MED_1
+PCTFREE    10
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          512K
+            NEXT             512K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE;
+
+
+CREATE UNIQUE INDEX WEBSYS.SMP_IDX1 ON STRANG.SMP
+(SMP_NO)
+LOGGING
+TABLESPACE PICTION_MED_1
+PCTFREE    10
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          512K
+            NEXT             512K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           );
+
+ALTER TABLE STRANG.SMP ADD (
+  PRIMARY KEY
+  (SMP_ID)
+  USING INDEX
+    TABLESPACE PICTION_MED_1
+    PCTFREE    10
+    INITRANS   2
+    MAXTRANS   255
+    STORAGE    (
+                INITIAL          512K
+                NEXT             512K
+                MINEXTENTS       1
+                MAXEXTENTS       UNLIMITED
+                PCTINCREASE      0
+                BUFFER_POOL      DEFAULT
+               )
+  ENABLE VALIDATE);
+
+
+--  There is no statement for index STRANG.SYS_C0016930.
+--  The object is created when the parent object is created.
+
+GRANT DELETE, INSERT, SELECT, UPDATE ON STRANG.SMP TO STX1;
+
+GRANT ALTER, DELETE, INDEX, INSERT, REFERENCES, SELECT, UPDATE, ON COMMIT REFRESH, QUERY REWRITE, DEBUG, FLASHBACK ON STRANG.SMP TO WEBSYS;

@@ -1,0 +1,34 @@
+DROP TABLE WEBSYS.AHECC_STAGING CASCADE CONSTRAINTS;
+
+CREATE TABLE WEBSYS.AHECC_STAGING
+(
+  CHAPTER                  VARCHAR2(10 BYTE),
+  CHAPTER_LABEL            VARCHAR2(500 BYTE),
+  HEADING                  VARCHAR2(10 BYTE),
+  HEADING_LABEL            VARCHAR2(1000 BYTE),
+  HS5                      VARCHAR2(10 BYTE),
+  HS5_LABEL                VARCHAR2(500 BYTE),
+  HS_CODE                  VARCHAR2(10 BYTE),
+  HS_CODE_LABEL            VARCHAR2(500 BYTE),
+  HS7                      VARCHAR2(10 BYTE),
+  HS7_LABEL                VARCHAR2(500 BYTE),
+  EXPORT_STATISTICAL_ITEM  VARCHAR2(10 BYTE),
+  UNIT_OF_QUANTITY         VARCHAR2(10 BYTE),
+  DESCRIPTOR               VARCHAR2(500 BYTE),
+  DATE_LOADED              DATE                 DEFAULT sysdate
+)
+TABLESPACE PICTION_MED_1
+PCTFREE    10
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          512K
+            NEXT             512K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE;

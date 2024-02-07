@@ -1,0 +1,44 @@
+DROP TABLE WEBSYS.CUSTOMER_PRICE_BOOK CASCADE CONSTRAINTS;
+
+CREATE TABLE WEBSYS.CUSTOMER_PRICE_BOOK
+(
+  PID               NUMBER(16),
+  AID               NUMBER(16),
+  VALID_UNTIL       DATE,
+  B2C_ENABLED       CHAR(1 BYTE)                DEFAULT 'T',
+  LTYPE             VARCHAR2(100 BYTE),
+  OID               NUMBER(16),
+  OID_WHEN_INVALID  NUMBER(16)
+)
+TABLESPACE PICTION_MED_1
+PCTFREE    10
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          32K
+            NEXT             32K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE;
+
+
+CREATE INDEX WEBSYS.I_CUSTOMER_PRICE_BOOK_1 ON WEBSYS.CUSTOMER_PRICE_BOOK
+(AID)
+LOGGING
+TABLESPACE PICTION_MED_1
+PCTFREE    0
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          256K
+            NEXT             256K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           );

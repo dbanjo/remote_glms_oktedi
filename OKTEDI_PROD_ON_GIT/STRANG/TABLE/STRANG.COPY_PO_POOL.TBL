@@ -1,0 +1,105 @@
+DROP TABLE STRANG.COPY_PO_POOL CASCADE CONSTRAINTS;
+
+CREATE TABLE STRANG.COPY_PO_POOL
+(
+  PO_NUMBER                   VARCHAR2(1000 BYTE),
+  PO_ITEM                     VARCHAR2(1000 BYTE),
+  DATE_CREATED                TIMESTAMP(6),
+  ACCTASSCAT                  VARCHAR2(1000 BYTE),
+  CITY                        VARCHAR2(1000 BYTE),
+  COLLECT_NO                  VARCHAR2(1000 BYTE),
+  COMP_CODE                   VARCHAR2(1000 BYTE),
+  CONV_DEN1                   VARCHAR2(1000 BYTE),
+  CONV_NUM1                   VARCHAR2(1000 BYTE),
+  COUNTRYISO                  VARCHAR2(1000 BYTE),
+  CREATED_BY                  VARCHAR2(1000 BYTE),
+  CREATE_DATE_HDR             VARCHAR2(1000 BYTE),
+  CRITICAL                    VARCHAR2(1000 BYTE),
+  CURRENCY_ISO                VARCHAR2(1000 BYTE),
+  DELETE_IND                  VARCHAR2(1000 BYTE),
+  DELIVERY_DATE               VARCHAR2(1000 BYTE),
+  DOC_DATE                    VARCHAR2(1000 BYTE),
+  DOC_TYPE                    VARCHAR2(1000 BYTE),
+  EXCH_RATE                   VARCHAR2(1000 BYTE),
+  FORMOFADDR                  VARCHAR2(1000 BYTE),
+  FREE_ITEM                   VARCHAR2(1000 BYTE),
+  GR_MESSAGE                  VARCHAR2(1000 BYTE),
+  GR_RCPT                     VARCHAR2(1000 BYTE),
+  INCOTERMS1                  VARCHAR2(1000 BYTE),
+  INCOTERMS2                  VARCHAR2(1000 BYTE),
+  ITEM_CAT                    VARCHAR2(1000 BYTE),
+  IV_QTY_PO                   VARCHAR2(1000 BYTE),
+  MANUAL_GR                   VARCHAR2(1000 BYTE),
+  MATERIAL                    VARCHAR2(1000 BYTE),
+  MATL_GROUP                  VARCHAR2(1000 BYTE),
+  MINREMLIFE                  VARCHAR2(1000 BYTE),
+  NET_PRICE                   VARCHAR2(1000 BYTE),
+  NET_WEIGHT                  VARCHAR2(1000 BYTE),
+  NO_MORE_GR                  VARCHAR2(1000 BYTE),
+  OPENQTY                     VARCHAR2(1000 BYTE),
+  ORDERID                     VARCHAR2(1000 BYTE),
+  ORDERPR_UN                  VARCHAR2(1000 BYTE),
+  ORDERPR_UN_ISO              VARCHAR2(1000 BYTE),
+  OUR_REF                     VARCHAR2(1000 BYTE),
+  OVER_DLV_TOL                VARCHAR2(1000 BYTE),
+  PCKG_NO                     VARCHAR2(1000 BYTE),
+  PERIOD_IND_EXPIRATION_DATE  VARCHAR2(1000 BYTE),
+  PLANT                       VARCHAR2(1000 BYTE),
+  POSTL_CODE                  VARCHAR2(1000 BYTE),
+  PO_PR_QNT                   VARCHAR2(1000 BYTE),
+  PO_UNIT                     VARCHAR2(1000 BYTE),
+  PO_UNIT_ISO                 VARCHAR2(1000 BYTE),
+  PREQ_ITEM                   VARCHAR2(1000 BYTE),
+  PREQ_NAME                   VARCHAR2(1000 BYTE),
+  PREQ_NO                     VARCHAR2(1000 BYTE),
+  PRICE_UNIT                  VARCHAR2(1000 BYTE),
+  PURCH_ORG                   VARCHAR2(1000 BYTE),
+  PUR_GROUP                   VARCHAR2(1000 BYTE),
+  QUAL_INSP                   VARCHAR2(1000 BYTE),
+  QUANTITY                    VARCHAR2(1000 BYTE),
+  REGION                      VARCHAR2(1000 BYTE),
+  RET_ITEM                    VARCHAR2(1000 BYTE),
+  SALES_PERS                  VARCHAR2(1000 BYTE),
+  SC_VENDOR                   VARCHAR2(1000 BYTE),
+  SHIPPING                    VARCHAR2(1000 BYTE),
+  SHIPPING_TEXT               VARCHAR2(1000 BYTE),
+  SHIPTYPE                    VARCHAR2(1000 BYTE),
+  SHORT_TEXT                  VARCHAR2(1000 BYTE),
+  STGE_LOC                    VARCHAR2(1000 BYTE),
+  STREET                      VARCHAR2(1000 BYTE),
+  SUPP_VENDOR                 VARCHAR2(1000 BYTE),
+  TAX_CODE                    VARCHAR2(1000 BYTE),
+  TELEPHONE                   VARCHAR2(1000 BYTE),
+  TRACKINGNO                  VARCHAR2(1000 BYTE),
+  UNDER_DLV_TOL               VARCHAR2(1000 BYTE),
+  UNLIMITED_DLV               VARCHAR2(1000 BYTE),
+  UNLOAD_PT                   VARCHAR2(1000 BYTE),
+  VAL_TYPE                    VARCHAR2(1000 BYTE),
+  VENDOR                      VARCHAR2(1000 BYTE),
+  VENDOR_TELEPHONE            VARCHAR2(1000 BYTE),
+  VEND_MAT                    VARCHAR2(1000 BYTE),
+  VEND_NAME                   VARCHAR2(1000 BYTE),
+  VOLUME                      VARCHAR2(1000 BYTE),
+  VOLUMEUNIT_ISO              VARCHAR2(1000 BYTE),
+  WBS_ELEMENT                 VARCHAR2(1000 BYTE),
+  WEIGHTUNIT_ISO              VARCHAR2(1000 BYTE),
+  DISTRICT                    VARCHAR2(4000 BYTE)
+)
+TABLESPACE PICTION_MED_1
+PCTFREE    10
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          512K
+            NEXT             512K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE;
+
+
+GRANT ALTER, DELETE, INDEX, INSERT, REFERENCES, SELECT, UPDATE, ON COMMIT REFRESH, QUERY REWRITE, DEBUG, FLASHBACK ON STRANG.COPY_PO_POOL TO WEBSYS;

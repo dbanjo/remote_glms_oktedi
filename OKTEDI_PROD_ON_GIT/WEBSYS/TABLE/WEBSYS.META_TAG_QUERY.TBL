@@ -1,0 +1,40 @@
+DROP TABLE WEBSYS.META_TAG_QUERY CASCADE CONSTRAINTS;
+
+CREATE TABLE WEBSYS.META_TAG_QUERY
+(
+  PID              NUMBER(16),
+  AID              NUMBER(16),
+  ORDER_BY         NUMBER(16),
+  CUST_ID          NUMBER(16),
+  LOGIN_TYPE       VARCHAR2(20 BYTE)            DEFAULT 'PHOTOGRAPHER',
+  SESSID           NUMBER(16),
+  SRC_NAME         VARCHAR2(100 BYTE),
+  ATTRIBUTE_ID     NUMBER(16),
+  VALUE_A          VARCHAR2(1000 BYTE),
+  VALUE_B          VARCHAR2(1000 BYTE),
+  SEARCH_TYPE      VARCHAR2(100 BYTE),
+  SEARCH_ITEM      VARCHAR2(100 BYTE),
+  STEM             CHAR(1 BYTE)                 DEFAULT 'F',
+  IS_GLOBAL        CHAR(1 BYTE)                 DEFAULT 'F',
+  IGNORE_LIGHTBOX  CHAR(1 BYTE)                 DEFAULT 'T',
+  ANDOR            VARCHAR2(10 BYTE),
+  NOTIFY_ON_NEW    CHAR(1 BYTE)                 DEFAULT 'F',
+  ROWS_RETURNED    NUMBER(16),
+  DATE_UPDATED     DATE,
+  SHOW_COLUMN      CHAR(1 BYTE)                 DEFAULT 'T'
+)
+TABLESPACE PICTION_MED_1
+PCTFREE    0
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          32K
+            NEXT             512K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE;

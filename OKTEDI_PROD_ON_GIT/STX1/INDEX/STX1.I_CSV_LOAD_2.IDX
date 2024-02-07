@@ -1,0 +1,17 @@
+DROP INDEX STX1.I_CSV_LOAD_2;
+
+CREATE INDEX STX1.I_CSV_LOAD_2 ON STX1.CSV_LOAD
+(ROW_ID, LOAD_ID, COL_ID)
+LOGGING
+TABLESPACE PICTION_MED_1
+PCTFREE    0
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          512K
+            NEXT             512K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      RECYCLE
+           );

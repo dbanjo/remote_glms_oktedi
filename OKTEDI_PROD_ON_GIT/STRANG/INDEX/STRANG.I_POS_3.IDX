@@ -1,0 +1,17 @@
+DROP INDEX STRANG.I_POS_3;
+
+CREATE INDEX STRANG.I_POS_3 ON STRANG.POS
+(DELIVERYNO, TAMOUNT)
+LOGGING
+TABLESPACE PICTION_MED_1
+PCTFREE    0
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          16M
+            NEXT             256K
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      KEEP
+           );
