@@ -38,6 +38,7 @@ as
       , to_Char(ir.post_date,'DD/MM/YY HH24:MI:SS') as "Post Date"
  from websys.interface4_records ir
 where trunc(post_date) = trunc(sysdate - 1)  
+ and NVL(ir.packing_status, 'XXXX') != 'INCOMPLETE'
 order by 1, 3, 4, 6;
  
  cursor c2 is
@@ -49,7 +50,8 @@ order by 1, 3, 4, 6;
           , ir.grn_item as "GRN Item"
           , ir.deliveryno as "Delivery No"
       from websys.interface4_records ir
-      where trunc(post_date) = trunc(sysdate - 1));
+      where trunc(post_date) = trunc(sysdate - 1)
+       and NVL(ir.packing_status, 'XXXX') != 'INCOMPLETE');
 
   cursor c3(vtoday date) is select to_char(sysdate) v1date from dual;
 
