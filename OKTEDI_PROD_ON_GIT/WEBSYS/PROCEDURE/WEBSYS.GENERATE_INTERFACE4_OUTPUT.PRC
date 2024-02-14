@@ -1,7 +1,7 @@
 CREATE OR REPLACE procedure WEBSYS.generate_interface4_output( surl in varchar2, vtoday in date, is_batch in varchar2 default 'FALSE' )
 as
 
--- JUST ADDED A NEW COMMENT
+-- FILTERED OUT INCOMPLETE packing status
 
  cursor c1 is
  select ir.po as "Purchase Order"
