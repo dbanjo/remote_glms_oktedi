@@ -54,6 +54,7 @@ as
         m.movement_no <> 'OTMU1234567' and 
         m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'TABUBIL') and 
         nvl(r.supplier_customer_id,0) = c.customer_id and 
+        NVL(m.complete, 'XXXX') != 'INCOMPLETE' and
         c.customer_type = 'SUPPLIER' and 
         exists (select 1
                   from strang.detailrs dr2
@@ -111,6 +112,7 @@ m.movement_no <> 'OTMU1234567' and
 m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'KIUNGA') and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
 r.currdate >  sysdate - 720 and 
+NVL(m.complete, 'XXXX') != 'INCOMPLETE' and
 c.customer_type = 'SUPPLIER' and 
  exists (select 1
              from  strang.detailrs dr2
@@ -169,6 +171,7 @@ m.current_location in (select code from strang.lov where lov_name='LOCATIONS' an
 --p.grn_status in (1,8,9) and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
 r.currdate >  sysdate - 720 and 
+NVL(m.complete, 'XXXX') != 'INCOMPLETE' and
 c.customer_type = 'SUPPLIER' and 
  exists (select 1
              from  strang.detailrs dr2
@@ -227,6 +230,7 @@ m.current_location in (select code from strang.lov where lov_name='LOCATIONS' an
 --p.grn_status in (1,8,9) and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
 r.currdate >  sysdate - 720 and 
+NVL(m.complete, 'XXXX') != 'INCOMPLETE' and
 c.customer_type = 'SUPPLIER' and 
  exists (select 1
              from  strang.detailrs dr2
@@ -288,6 +292,7 @@ m.current_location in (select code from strang.lov where lov_name='LOCATIONS' an
 --p.grn_status in (1,8,9) and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
 r.currdate >  sysdate - 720 and 
+NVL(m.complete, 'XXXX') != 'INCOMPLETE' and
 c.customer_type = 'SUPPLIER' and 
  exists (select 1
              from  strang.detailrs dr2
@@ -352,6 +357,7 @@ c.customer_type = 'SUPPLIER' and
         m.movement_no <> 'OTMU1234567' and 
         m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'TABUBIL') and 
         nvl(r.supplier_customer_id,0) = c.customer_id and 
+        NVL(m.complete, 'XXXX') != 'INCOMPLETE' and
         c.customer_type = 'SUPPLIER' and 
         exists (select 1
                   from strang.detailrs dr2
@@ -409,6 +415,7 @@ m.movement_no <> 'OTMU1234567' and
 m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'KIUNGA') and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
 r.currdate >  sysdate - 720 and 
+NVL(m.complete, 'XXXX') != 'INCOMPLETE' and
 c.customer_type = 'SUPPLIER' and 
  exists (select 1
              from  strang.detailrs dr2
@@ -467,6 +474,7 @@ m.current_location in (select code from strang.lov where lov_name='LOCATIONS' an
 --p.grn_status in (1,8,9) and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
 r.currdate >  sysdate - 720 and 
+NVL(m.complete, 'XXXX') != 'INCOMPLETE' and
 c.customer_type = 'SUPPLIER' and 
  exists (select 1
              from  strang.detailrs dr2
@@ -525,6 +533,7 @@ m.current_location in (select code from strang.lov where lov_name='LOCATIONS' an
 --p.grn_status in (1,8,9) and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
 r.currdate >  sysdate - 720 and 
+NVL(m.complete, 'XXXX') != 'INCOMPLETE' and
 c.customer_type = 'SUPPLIER' and 
  exists (select 1
              from  strang.detailrs dr2
@@ -586,6 +595,7 @@ m.current_location in (select code from strang.lov where lov_name='LOCATIONS' an
 --p.grn_status in (1,8,9) and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
 r.currdate >  sysdate - 720 and 
+NVL(m.complete, 'XXXX') != 'INCOMPLETE' and
 c.customer_type = 'SUPPLIER' and 
  exists (select 1
              from  strang.detailrs dr2
