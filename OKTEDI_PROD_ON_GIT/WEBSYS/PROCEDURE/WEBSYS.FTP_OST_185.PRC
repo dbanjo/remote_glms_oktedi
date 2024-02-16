@@ -42,8 +42,8 @@ begin
     begin dbms_scheduler.create_job('job_ftp_ost_185', 'EXECUTABLE', c_cmd, 3); exception when others then null; end;
     dbms_scheduler.set_job_argument_value('job_ftp_ost_185', 1, '/Q');
     dbms_scheduler.set_job_argument_value('job_ftp_ost_185', 2, '/C');
-   -- v_cmd := c_sftp || ' '  ||c_un||'@'|| c_svr || ' -batch -pw ' || c_pw ||' -be -b "' || c_dir || '\' || c_bat || '"';
-       v_cmd := c_sftp || ' ' || c_svr || ' -hostkey be:8a:4d:a4:19:4d:6c:fa:da:98:8c:d8:d9:25:8c:5f -batch -l ' || c_un || ' -pw ' || c_pw || ' -P 22 -be  -b "' || c_dir || '\' || c_bat || '"';
+    v_cmd := c_sftp || ' '  ||c_un||'@'|| c_svr || ' -batch -pw ' || c_pw ||' -be -b "' || c_dir || '\' || c_bat || '"';
+   --    v_cmd := c_sftp || ' ' || c_svr || ' -hostkey be:8a:4d:a4:19:4d:6c:fa:da:98:8c:d8:d9:25:8c:5f -batch -l ' || c_un || ' -pw ' || c_pw || ' -P 22 -be  -b "' || c_dir || '\' || c_bat || '"';
     dbms_scheduler.set_job_argument_value('job_ftp_ost_185', 3, v_cmd);
     -- dbms_output.put_line(v_cmd);
     dbms_scheduler.enable('job_ftp_ost_185');
