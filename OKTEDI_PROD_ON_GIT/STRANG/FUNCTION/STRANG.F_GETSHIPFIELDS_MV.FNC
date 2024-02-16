@@ -62,9 +62,9 @@ CREATE OR REPLACE function STRANG.f_getShipFields_mv( mv in varchar2, sl in varc
          return(nvl(c2rec.voy,' '));
        elsif fld = 'SHIP_ID' then
          return(nvl(to_char(c2rec.ship_id),' '));
-       elsif fld = 'ESTARRIVE' and c2rec.ship_id <> 9001655 then
+       elsif fld = 'ESTARRIVE' and c2rec.ship_id NOT IN (3,4,5,6, 9002767, 9001655) then
          return( nvl(to_char(c2rec.estarrive),' '));
-       elsif fld = 'ESTDEPART' and c2rec.ship_id <> 9001655 then
+       elsif fld = 'ESTDEPART' and c2rec.ship_id NOT IN (3,4,5,6, 9002767, 9001655)  then
          return( nvl(to_char(c2rec.estdepart),' '));
        elsif fld = 'PORTLOAD' then
          return( nvl(to_char(c2rec.portload),' '));
