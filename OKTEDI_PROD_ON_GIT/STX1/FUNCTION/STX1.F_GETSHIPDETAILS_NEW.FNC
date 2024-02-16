@@ -33,14 +33,14 @@ CREATE OR REPLACE FUNCTION STX1."F_GETSHIPDETAILS_NEW" ( delno in number, itm in
    c2rec  c2%ROWTYPE;
 
    begin
-   
+  
    
    if typ = 'I' then 
       open c1(delno,itm);
       fetch c1 into c1rec;
         if c1%FOUND
         then
-           if (c1rec.ship_id in (1,2)) or (c1rec.ship_id is null) then
+           if (c1rec.ship_id in (1,2,3,4,5,6, 9002767)) or (c1rec.ship_id is null) then
              close c1;
              ret_value :=  null ;
            elsif section = 'shipname' then
@@ -93,7 +93,7 @@ CREATE OR REPLACE FUNCTION STX1."F_GETSHIPDETAILS_NEW" ( delno in number, itm in
     fetch c2 into c2rec;
     if c2%FOUND
     then
-       if c2rec.ship_id in (1,2)  or (c2rec.ship_id is null) then
+       if c2rec.ship_id in (1,2,3,4,5,6, 9002767)  or (c2rec.ship_id is null) then
           close c2;
           return( null );
        elsif section = 'shipname' then
