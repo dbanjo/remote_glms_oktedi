@@ -7,6 +7,7 @@ as
  c_sftp       CONSTANT varchar2(100) := glbx.extract_master_parameter('BIN_DIR') || '\psftp.exe';
 -- c_sftp       CONSTANT varchar2(100) := glbx.extract_master_parameter('BIN_DIR') || '\psftp.exe';
  c_dir        CONSTANT varchar2(100) := glbx.extract_master_parameter('MAIL_TEMPLATE_DIR');
+ tmp_dir      CONSTANT varchar2(100) := 'c:\temp\';
  c_rdir       CONSTANT varchar2(100) := '/PowerBI/Strang/'; --    --'strang';   
  --c_rdir2      CONSTANT varchar2(100) := 'Strang';
  c_bat        CONSTANT varchar2(100) := 'ftp_ost_185.bat';
@@ -74,7 +75,7 @@ eml := nvl( eml, glbx.extract_master_parameter('MAIL_FROM') );
     -- dbms_output.put_line(c_dir || '\' || c_bat);
     -- dbms_output.put_line(c_sftp);
     
-    f := utl_file.fopen(c_dir, c_bat, 'w', 1000);
+    f := utl_file.fopen(tmp_dir, c_bat, 'w', 1000);
     utl_file.put_line(f, 'lcd ' || c_dir);
     utl_file.put_line(f, 'cd ' || c_rdir);
    -- utl_file.put_line(f, 'cd ' || c_rdir2 );
@@ -86,9 +87,9 @@ eml := nvl( eml, glbx.extract_master_parameter('MAIL_FROM') );
     dbms_scheduler.create_job('job_ftp_ost_185', 'EXECUTABLE', c_cmd, 3); exception when others then null; end;  -- be:8a:4d:a4:19:4d:6c:fa:da:98:8c:d8:d9:25:8c:5f
     dbms_scheduler.set_job_argument_value('job_ftp_ost_185', 1, '/Q');
     dbms_scheduler.set_job_argument_value('job_ftp_ost_185', 2, '/C');
-    v_cmd := c_sftp || ' '  ||c_un||'@'|| c_svr || ' -hostkey "33:d3:f5:6a:8d:b6:06:1c:d1:d8:92:c9:52:8e:6a:58"  -batch -pw ' || c_pw ||' -be -b "' || c_dir || '\' || c_bat || '"';
+    v_cmd := c_sftp || ' '  ||c_un||'@'|| c_svr || ' -hostkey "33:d3:f5:6a:8d:b6:06:1c:d1:d8:92:c9:52:8e:6a:58"  -batch -pw ' || c_pw ||' -be -b "' || tmp_dir || '\' || c_bat || '"';
   --   v_cmd := c_sftp || ' ' ||c_un||'@'|| c_svr || ' -hostkey "33:d3:f5:6a:8d:b6:06:1c:d1:d8:92:c9:52:8e:6a:58"  -batch -pw ' || c_pw || ' -P 22 -be  -b "' || c_dir || '\' || c_bat || '"';
-   --v_cmd := c_sftp || ' ' || c_svr || ' -hostkey 33:d3:f5:6a:8d:b6:06:1c:d1:d8:92:c9:52:8e:6a:58 -batch -l ' || c_un || ' -pw ' || c_pw || ' -P 22 -be  -b "' || c_dir || '\' || c_bat || '"';
+   -- v_cmd := c_sftp || ' ' || c_svr || ' -hostkey 33:d3:f5:6a:8d:b6:06:1c:d1:d8:92:c9:52:8e:6a:58 -batch -l ' || c_un || ' -pw ' || c_pw || ' -P 22 -be  -b "' || c_dir || '\' || c_bat || '"';
     dbms_scheduler.set_job_argument_value('job_ftp_ost_185', 3, v_cmd);
     -- dbms_output.put_line(v_cmd);
     -----------------------------------------------------------------------------------------
@@ -122,7 +123,9 @@ eml := nvl( eml, glbx.extract_master_parameter('MAIL_FROM') );
     dbms_scheduler.purge_log(7, job_name=>'job_ftp_ost_185');
     -- v_cmd := glbx.extract_master_parameter('WINDOWS_SHELL') || ' ' || c_sftp || ' ' || c_un || '@' || c_svr || ' -pw ' || c_pw || ' -b "' || c_dir || '\' || c_bat || '"';
     -- x := oscommand_run(v_cmd);
-     utl_file.fremove(c_dir, c_bat);
+   -- utl_file.fremove(c_dir, c_bat);
+  dbms_lock.sleep(10);
+  utl_file.fremove(tmp_dir, c_bat);
      
   end case;
 exception when others then
