@@ -8387,7 +8387,7 @@ Please vary Delivery no and recno as well as supplier invoice number in you samp
           nvl(d.camov_seal,'|') = nvl(m.seal,'|') and
           d.deliveryno = p.deliveryno and
           d.deliveryno = r.deliveryno and
-          r.cust_customer_id = 1 and
+          r.cust_customer_id in (1,9005960,576,596,575,9002717) and
 	      nvl(m.complete,'|') <> 'J' and 
 	      m.interface4_date is null and 
 	      exists ( select 'x' 
@@ -8427,7 +8427,7 @@ Please vary Delivery no and recno as well as supplier invoice number in you samp
          nvl(d.camov_seal,'|') = nvl(m.seal,'|') and
          d.deliveryno = p.deliveryno and
          d.deliveryno = r.deliveryno and
-         r.cust_customer_id = 1 and
+         r.cust_customer_id in (1,9005960,576,596,575,9002717) and
 	 nvl(m.complete,'|') <> 'J' and
 	 m.interface4_date is null and 
 	 not exists (select 'x' 
@@ -8883,5 +8883,4 @@ https://glms.stxgroup.com.au:4430/sws/trace
 */
 
 end strangw;
-
 /
