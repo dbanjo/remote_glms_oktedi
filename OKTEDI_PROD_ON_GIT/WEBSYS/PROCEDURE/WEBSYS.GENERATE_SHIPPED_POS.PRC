@@ -43,7 +43,7 @@ as
         p.deliveryno = r.deliveryno and 
         r.currdate >  sysdate - 720 and 
      --   substr(p.po,1,2) in ('47','43','45') and
-        r.cust_customer_id = 1 and 
+        r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
         dr.io = 'I' and 
         dr.movement_no = m.movement_no and
         nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
@@ -101,7 +101,7 @@ select p.po as "Purchase Order"
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
 --substr(p.po,1,2) in ('47','43','45') and
-r.cust_customer_id = 1 and 
+r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
 dr.io = 'I' and 
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
@@ -157,7 +157,7 @@ select p.po as "Purchase Order"
 where p.deliveryno = dr.deliveryno and 
 --substr(p.po,1,2) in ('47','43','45') and
 p.deliveryno = r.deliveryno and 
-r.cust_customer_id = 1 and 
+r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
 dr.io = 'I' and 
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
@@ -216,7 +216,7 @@ select p.po as "Purchase Order"
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
 --substr(p.po,1,2) in ('47','43','45') and
-r.cust_customer_id = 1 and 
+r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
 dr.io = 'I' and 
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
@@ -277,7 +277,7 @@ from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, s
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
 --substr(p.po,1,2) in ('47','43','45') and
-r.cust_customer_id = 1 and 
+r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
 dr.io = 'I' and 
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
@@ -346,7 +346,7 @@ c.customer_type = 'SUPPLIER' and
         p.deliveryno = r.deliveryno and 
         r.currdate >  sysdate - 720 and 
      --   substr(p.po,1,2) in ('47','43','45') and
-        r.cust_customer_id = 1 and 
+        r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
         dr.io = 'I' and 
         dr.movement_no = m.movement_no and
         nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
@@ -404,7 +404,7 @@ select p.po as "Purchase Order"
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
 --substr(p.po,1,2) in ('47','43','45') and
-r.cust_customer_id = 1 and 
+r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
 dr.io = 'I' and 
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
@@ -460,7 +460,7 @@ select p.po as "Purchase Order"
 where p.deliveryno = dr.deliveryno and 
 --substr(p.po,1,2) in ('47','43','45') and
 p.deliveryno = r.deliveryno and 
-r.cust_customer_id = 1 and 
+r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
 dr.io = 'I' and 
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
@@ -519,7 +519,7 @@ select p.po as "Purchase Order"
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
 --substr(p.po,1,2) in ('47','43','45') and
-r.cust_customer_id = 1 and 
+r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
 dr.io = 'I' and 
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
@@ -580,7 +580,7 @@ from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, s
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
 --substr(p.po,1,2) in ('47','43','45') and
-r.cust_customer_id = 1 and 
+r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
 dr.io = 'I' and 
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
