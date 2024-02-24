@@ -42424,7 +42424,9 @@ begin
  -- begin select sum(to_number(partvolume)) into v_volume from strang.detailrs where smp_no = p1 ; exception when others then v_volume := NULL; end;
 --------------------------------------------------------------------------------
   v_volume := nvl(((v_lngth/100) * (v_width/100) * (v_height/100)),0.000);
- if action = LNGS.STR_STH_031
+  
+  
+ if action = LNGS.STR_STH_031 or (access_id = 'z' and action = LNGS.STR_STH_032 )  -- amended by DB 24/2/24
   then
    if p1 is null
     then
