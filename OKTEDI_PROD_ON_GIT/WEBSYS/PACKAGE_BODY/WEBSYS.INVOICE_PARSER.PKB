@@ -378,7 +378,10 @@ begin
  
  htp.headclose;
  -- added by DB 4/7/2023
- if upper(msg) like '%CUMULATIVE QUANTITY THAT EXCEEDS THE SAP OPEN QUANTITY%' then
+ if upper(msg) like  '%ERROR%CUMULATIVE QUANTITY THAT EXCEEDS THE SAP OPEN QUANTITY%' then 
+    htp.bodyopen( CATTRIBUTES=>'onload="Swal.fire(''Error'', ''Cumulative Quantity of item exceeds SAP Open Qty. Please Contact Manager!!'', ''error'')" ');
+  --  htp.bodyopen( CATTRIBUTES=>'onload="Swal.fire(''Warning'', ''Cumulative Quantity of item exceeds SAP Open Qty. Please Contact Manager!!'', ''warning'')" ');
+ elsif upper(msg) like '%CUMULATIVE QUANTITY THAT EXCEEDS THE SAP OPEN QUANTITY%' then
    --htp.bodyopen( CATTRIBUTES=>'onload="alert(''Cumulative Quantity of item exceeds SAP Open Qty. Please Contact Manager!!'')" ');
    htp.bodyopen( CATTRIBUTES=>'onload="Swal.fire(''Warning'', ''Cumulative Quantity of item exceeds SAP Open Qty. Please Contact Manager!!'', ''warning'')" ');
  else
@@ -1375,6 +1378,26 @@ cursor c7 ( v_batch number) is select distinct max(date_created) over (partition
                                            and ii2.DELETE_FLG IS NULL) tmp
                                          where rnk = 1);  
 
+  -- Added by DB on 27/2/24
+  
+   cursor c23 ( v_batch number) is select h.VENDOR_ID, h.vendor
+                                       from strang.parsed_invoice_items ii
+                                       , strang.parsed_invoice_header h
+                                 where ii.batch_id = v_batch
+                                   and ii.batch_id = h.batch_id
+                                   and (upper(h.vendor) like 'HASTINGS%DEERING%' OR upper(h.vendor) like 'BLUESCOPE%')
+                                   and ii.delete_flg is null
+                                   and ii.invoice_filename = (select tmp.invoice_filename
+                                                                from (select ii2.invoice_filename
+                                                                           , row_number() over (partition by ii2.batch_id order by ii2.date_created desc) rnk
+                                                                        from strang.parsed_invoice_items ii2
+                                                                       where ii2.batch_id = v_batch
+                                                                         and ii2.DELETE_FLG IS NULL) tmp
+                                                               where rnk = 1)
+   order by recno desc ;  
+
+
+
  c1rec         customer_account%ROWTYPE;
  c2rec         c2%ROWTYPE;
  c3rec         c3%ROWTYPE;
@@ -1397,6 +1420,7 @@ cursor c7 ( v_batch number) is select distinct max(date_created) over (partition
  c20rec        c20%ROWTYPE;
  c21rec        c21%ROWTYPE;
  c22rec        c22%ROWTYPE;
+ c23rec        c23%ROWTYPE;  -- added by db
  status        number;
  deliveryno    number := 123456;
  v_dir         varchar2(64);
@@ -1852,6 +1876,30 @@ begin
 	        close c14;
 	       
 	        if nvl(c15rec.sum_qty,0) + nvl(v_p3,0) > nvl(c14rec.openqty,0) then
+	           
+--	           open c18(batchno);
+--	           fetch c18 into c18rec;
+--	           close c18;
+--	           
+--	           if c18rec.vendor_id in (1,2) then
+--	              vmsg := 'ERROR: Invoice Number '||c20rec.supinv||' already processed for supplier '||c20rec.vendor ||' on deliveryno '||c20rec.deliveryno||' with same PO details : '||c20rec.po||'('||c20rec.po_item_no||'). Invoice Parser tool can not proceed!';
+--                  invoice_mng(surl,  vtyp, vmsg,batchno => v_batch );
+--                  return;
+--	           end if;
+	           
+	          -- DB begin here
+	           open c23(batchno);
+	           fetch c23 into c23rec;
+	           
+	           if c23%found then
+	             close c23;
+	              vmsg := 'ERROR: PO '||c8rec.po_number||' Item '||p1(j)||' in batch has a Cumulative Quantity that exceeds the SAP Open Quantity for '||c23rec.vendor||'. Invoice Parser tool can not proceed!';
+                  invoice_mng(surl,  vtyp, vmsg,batchno => v_batch );
+                  return;
+	           end if;
+	           close c23;
+	           
+	           
 	           if vmsg is not null then
 	              vmsg := vmsg||htf.nl||'WARNING: PO '||c8rec.po_number||' Item '||p1(j)||' in batch has a Cumulative Quantity that exceeds the SAP Open Quantity. Please Contact Manager!!';
 	           else
@@ -2321,17 +2369,17 @@ begin
           fetch c21 into c21rec;
           if c21%notfound and nvl(v_del_chg,0) <> 0  then 
              if vmsg is not null then
-	            vmsg := vmsg||htf.nl||'Check delivery charge item number is in PO item no list';
+	            vmsg := vmsg||htf.nl||'Check delivery charge item number is in PO item number dropdown list';
 	         else 
-                vmsg := 'Check delivery charge item number is in PO item no list';
+                vmsg := 'Check delivery charge item number is in PO item number dropdown list';
              end if;
           
           else
           
              if vmsg is not null then
-	            vmsg := vmsg||htf.nl||'The ensure that the invoice total equals the sum of the item amounts + delivery charges';
+	            vmsg := vmsg||htf.nl||'Please ensure that the invoice total equals the sum of the item amounts + delivery charges';
 	         else 
-                vmsg := 'The ensure that the invoice total equals the sum of the item amounts + delivery charges';
+                vmsg := 'Please ensure that the invoice total equals the sum of the item amounts + delivery charges';
              end if;
           end if;
           close c21;
