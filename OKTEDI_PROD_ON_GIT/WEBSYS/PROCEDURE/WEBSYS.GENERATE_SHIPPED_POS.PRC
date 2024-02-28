@@ -37,6 +37,8 @@ as
        , dr.hawb_hawbno as "Hawb Intl"
        , dr.hawb_hawbno_2 as "Hawb Local"
        , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
+       , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'INVENTORYNO') else null end "Material Number"
+       , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') "Description"
    from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r
       , strang.customers c
   where p.deliveryno = dr.deliveryno and 
@@ -97,6 +99,8 @@ select p.po as "Purchase Order"
        , dr.hawb_hawbno as "Hawb Intl"
        , dr.hawb_hawbno_2 as "Hawb Local"
        , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
+       , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'INVENTORYNO') else null end "Material Number"
+       , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') "Description"
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
@@ -153,6 +157,8 @@ select p.po as "Purchase Order"
        , dr.hawb_hawbno as "Hawb Intl"
        , dr.hawb_hawbno_2 as "Hawb Local"
        , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
+       , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'INVENTORYNO') else null end "Material Number"
+       , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') "Description"
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 --substr(p.po,1,2) in ('47','43','45') and
@@ -212,6 +218,8 @@ select p.po as "Purchase Order"
        , dr.hawb_hawbno as "Hawb Intl"
        , dr.hawb_hawbno_2 as "Hawb Local"
        , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
+       , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'INVENTORYNO') else null end "Material Number"
+       , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') "Description"
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
@@ -273,6 +281,8 @@ select p.po as "Purchase Order"
        , dr.hawb_hawbno as "Hawb Intl"
        , dr.hawb_hawbno_2 as "Hawb Local"
        , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
+       , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'INVENTORYNO') else null end "Material Number"
+       , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') "Description"
 from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
@@ -678,7 +688,7 @@ begin
   utl_file.put_line(f, buffer=>'"Purchase Order","PO Item No","GRN","GRN Item","Delivery No","PO Rno","Packing Status","Priority","Movement Type","Container",'||
                                '"Seal","Direction","Full Or Empty","Consignee","Consignee Location","Warehouse Destination","Current Location","Customs Cleared Date",'||
                                '"Local BOL","Intl BOL","Intl Ship Name","Intl Voyage","Intl Est Arrival Date","Local Ship Name","Local Voyage","Local Est Arrival Date",'||
-                               '"Convoy Name","Convoy Type","Convoy Depart Date","Hawb Intl","Hawb Local","Post Date"');     
+                               '"Convoy Name","Convoy Type","Convoy Depart Date","Hawb Intl","Hawb Local","Post Date","Material Number","Description"');     
 --32
  ctr := 0;
  for c1rec in c1 loop
@@ -688,7 +698,8 @@ begin
                         || c1rec."Full Or Empty" ||'","'||c1rec."Consignee"||'","'||c1rec."Consignee Location"||'","'||c1rec."Warehouse Destination"||'","'||c1rec."Current Location"||'","'||c1rec."Customs Cleared Date"||'","'
                         || c1rec."Local BOL"||'","'|| c1rec."Intl BOL"||'","'||c1rec."Intl Ship Name"||'","'||c1rec."Intl Voyage"||'","'||c1rec."Intl Est Arrival Date"||'","'||c1rec."Local Ship Name"||'","'
                         || c1rec."Local Voyage"||'","'||c1rec."Local Est Arrival Date"||'","'
-                        || c1rec."Convoy Name"||'","'||c1rec."Convoy Type"||'","'||c1rec."Convoy Depart Date"||'","'||c1rec."Hawb Intl"||'","'||c1rec."Hawb Local"||'","'||c1rec."Post Date"||'"');
+                        || c1rec."Convoy Name"||'","'||c1rec."Convoy Type"||'","'||c1rec."Convoy Depart Date"||'","'
+                        || c1rec."Hawb Intl"||'","'||c1rec."Hawb Local"||'","'||c1rec."Post Date"||'","'||c1rec."Material Number"||'","'||c1rec."Description"||'"');
 
                         
                         
@@ -711,7 +722,7 @@ begin
   utl_file.put_line(f2, buffer=>'"Purchase Order","PO Item No","GRN","GRN Item","Delivery No","PO Rno","Packing Status","Priority","Movement Type","Container",'||
                                '"Seal","Direction","Full Or Empty","Consignee","Consignee Location","Warehouse Destination","Current Location","Customs Cleared Date",'||
                                '"Local BOL","Intl BOL","Intl Ship Name","Intl Voyage","Intl Est Arrival Date","Local Ship Name","Local Voyage","Local Est Arrival Date",'||
-                               '"Convoy Name","Convoy Type","Convoy Depart Date","Hawb Intl","Hawb Local","Post Date"');     
+                               '"Convoy Name","Convoy Type","Convoy Depart Date","Hawb Intl","Hawb Local","Post Date","Material Number","Description"');     
   
 
   ctr1 := 0;
@@ -729,7 +740,8 @@ begin
                         || c1rec."Full Or Empty" ||'","'||c1rec."Consignee"||'","'||c1rec."Consignee Location"||'","'||c1rec."Warehouse Destination"||'","'||c1rec."Current Location"||'","'||c1rec."Customs Cleared Date"||'","'
                         || c1rec."Local BOL"||'","'|| c1rec."Intl BOL"||'","'||c1rec."Intl Ship Name"||'","'||c1rec."Intl Voyage"||'","'||c1rec."Intl Est Arrival Date"||'","'||c1rec."Local Ship Name"||'","'
                         || c1rec."Local Voyage"||'","'||c1rec."Local Est Arrival Date"||'","'
-                        || c1rec."Convoy Name"||'","'||c1rec."Convoy Type"||'","'||c1rec."Convoy Depart Date"||'","'||c1rec."Hawb Intl"||'","'||c1rec."Hawb Local"||'","'||c1rec."Post Date"||'"');
+                        || c1rec."Convoy Name"||'","'||c1rec."Convoy Type"||'","'||c1rec."Convoy Depart Date"||'","'
+                        ||c1rec."Hawb Intl"||'","'||c1rec."Hawb Local"||'","'||c1rec."Post Date"||'","'||c1rec."Material Number"||'","'||c1rec."Description"||'"');
   
               
    
