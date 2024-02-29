@@ -37,7 +37,7 @@ as
        , dr.hawb_hawbno as "Hawb Intl"
        , dr.hawb_hawbno_2 as "Hawb Local"
        , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
-       , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'INVENTORYNO') else null end "Material Number"
+       , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'VMR_INVENTORYNO') else null end "Material Number"
        , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') "Description"
    from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r
       , strang.customers c
@@ -99,7 +99,7 @@ select p.po as "Purchase Order"
        , dr.hawb_hawbno as "Hawb Intl"
        , dr.hawb_hawbno_2 as "Hawb Local"
        , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
-       , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'INVENTORYNO') else null end "Material Number"
+       , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'VMR_INVENTORYNO') else null end "Material Number"
        , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') "Description"
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
@@ -157,7 +157,7 @@ select p.po as "Purchase Order"
        , dr.hawb_hawbno as "Hawb Intl"
        , dr.hawb_hawbno_2 as "Hawb Local"
        , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
-       , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'INVENTORYNO') else null end "Material Number"
+       , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'VMR_INVENTORYNO') else null end "Material Number"
        , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') "Description"
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
@@ -218,7 +218,7 @@ select p.po as "Purchase Order"
        , dr.hawb_hawbno as "Hawb Intl"
        , dr.hawb_hawbno_2 as "Hawb Local"
        , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
-       , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'INVENTORYNO') else null end "Material Number"
+       , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'VMR_INVENTORYNO') else null end "Material Number"
        , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') "Description"
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
@@ -281,7 +281,7 @@ select p.po as "Purchase Order"
        , dr.hawb_hawbno as "Hawb Intl"
        , dr.hawb_hawbno_2 as "Hawb Local"
        , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
-       , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'INVENTORYNO') else null end "Material Number"
+       , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'VMR_INVENTORYNO') else null end "Material Number"
        , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') "Description"
 from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
