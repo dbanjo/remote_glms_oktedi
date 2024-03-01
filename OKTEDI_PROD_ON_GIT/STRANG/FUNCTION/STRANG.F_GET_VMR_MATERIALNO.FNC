@@ -6,7 +6,7 @@ CREATE OR REPLACE function STRANG.f_get_vmr_materialno (vMovement varchar2, vSea
     cursor c1(vCtr varchar2,vSeal varchar2, vdeliveryno number, vpo_number varchar2, vpo_item varchar2 ) is
     select *
     from 
-    (select distinct p.inventoryno, p.description 
+    (select distinct p.inventoryno, l.description 
     from strang.receivals r, strang.pos p, strang.detailrs dr, strang.movements m, strang.customers c, strang.lov l
     where dr.movement_no = m.movement_no
           and nvl(camov_seal,'|') = nvl(seal,'|')
@@ -31,8 +31,13 @@ CREATE OR REPLACE function STRANG.f_get_vmr_materialno (vMovement varchar2, vSea
 begin
  retvar := null;
  if action ='VMR_INVENTORYNO' then             
-       for c1rec in c1( vMovement, vSeal ) loop
+       for c1rec in c1( vMovement, vSeal,vdeliveryno , vpo_number, vpo_item ) loop
        retvar := retvar || ' ' || c1rec.inventoryno;
+       end loop;
+      return( ltrim(nvl(retvar,' '),', ') );
+  elsif action ='VMR_INVENTORYDESC' then             
+       for c1rec in c1( vMovement, vSeal,vdeliveryno , vpo_number, vpo_item ) loop
+       retvar := retvar || ' ' || c1rec.description;
        end loop;
       return( ltrim(nvl(retvar,' '),', ') );
   else
@@ -41,3 +46,6 @@ begin
   return ( null );
  end f_get_vmr_materialno;
 /
+
+
+GRANT EXECUTE ON STRANG.F_GET_VMR_MATERIALNO TO WEBSYS;
