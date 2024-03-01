@@ -50,7 +50,24 @@ CREATE OR REPLACE function STRANG.f_get_info(vMovement varchar2, vSeal varchar2 
           and nvl(m.seal,'|') = nvl(vSeal,'|')) tmp
     where rownum < 5;
           
-          
+    cursor c6(vCtr varchar2,vSeal varchar2) is
+    select *
+    from 
+    (select distinct p.inventoryno
+    from strang.receivals r, strang.pos p, strang.detailrs dr, strang.movements m, strang.customers c
+    where dr.movement_no = m.movement_no
+          and nvl(camov_seal,'|') = nvl(seal,'|')
+          and dr.deliveryno = p.deliveryno
+          and dr.deliveryno = r.deliveryno
+          and exists (select 'x'
+                        from strang.lov l
+                       where l.lov_name = 'INVENT'
+                         and l.colj = 'VMR'
+                         and p.inventoryno = l.code)
+          and r.supplier_customer_id = c.customer_id
+          and m.movement_no = vCtr
+          and nvl(m.seal,'|') = nvl(vSeal,'|')) tmp
+    where rownum < 5;      
 
  c1rec  c1%ROWTYPE;
  c3rec  c3%ROWTYPE;
@@ -104,6 +121,11 @@ begin
   elsif action = 'INVENTORYNO' then 
        for c5rec in c5( vMovement, vSeal ) loop
        retvar := retvar || ' ' || c5rec.inventoryno;
+       end loop;
+      return( ltrim(nvl(retvar,' '),', ') );
+  elsif action = 'VMR_INVENTORYNO' then             
+       for c6rec in c6( vMovement, vSeal ) loop
+       retvar := retvar || ' ' || c6rec.inventoryno;
        end loop;
       return( ltrim(nvl(retvar,' '),', ') );
   else
