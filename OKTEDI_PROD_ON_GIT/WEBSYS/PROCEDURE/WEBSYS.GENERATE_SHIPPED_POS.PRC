@@ -46,14 +46,15 @@ as
         p.deliveryno = r.deliveryno and 
         r.currdate >  sysdate - 720 and 
      --   substr(p.po,1,2) in ('47','43','45') and
-        r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
-        dr.io = 'I' and 
+     --   r.cust_customer_id in (1,9005960,576,596,575,9002717, 9007901) and 
+     --   dr.io in ('I','O') and 
+        (( r.cust_customer_id in (1,9005960,576,596,575,9002717) and r.io = 'I') or (r.cust_customer_id in ( 9007901) and r.io = 'O')) and
         dr.movement_no = m.movement_no and
         nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
         nvl(m.complete,'S') NOT IN ('H','J','F') and
     --    nvl(m.complete,'S') NOT IN ('H','J','D') and
        -- nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
-        m.io='I' and 
+        m.io in ('I', 'O') and 
         m.movement_no <> 'OTMU1234567' and 
         m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'TABUBIL') and 
         nvl(r.supplier_customer_id,0) = c.customer_id and 
@@ -108,13 +109,13 @@ select p.po as "Purchase Order"
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
 --substr(p.po,1,2) in ('47','43','45') and
-r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
-dr.io = 'I' and 
+--r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
+--dr.io = 'I' and 
+ (( r.cust_customer_id in (1,9005960,576,596,575,9002717) and r.io = 'I') or (r.cust_customer_id in ( 9007901) and r.io = 'O')) and
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
 nvl(m.complete,'S') NOT IN ('H','J','F') and
---nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
-m.io='I' and 
+m.io in ('I','O') and 
 m.movement_no <> 'OTMU1234567' and 
 m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'KIUNGA') and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
@@ -168,13 +169,14 @@ select p.po as "Purchase Order"
 where p.deliveryno = dr.deliveryno and 
 --substr(p.po,1,2) in ('47','43','45') and
 p.deliveryno = r.deliveryno and 
-r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
-dr.io = 'I' and 
+--r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
+--dr.io = 'I' and 
+ (( r.cust_customer_id in (1,9005960,576,596,575,9002717) and r.io = 'I') or (r.cust_customer_id in ( 9007901) and r.io = 'O')) and
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
 nvl(m.complete,'S') NOT IN ('H','J','F') and
 --nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
-m.io='I' and 
+m.io in ('I', 'O') and 
 m.movement_no <> 'OTMU1234567' and 
 m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'MOTUKEA') and 
 --(dr.DELIVERYNO between 1000000 and 1999999 or
@@ -231,13 +233,14 @@ select p.po as "Purchase Order"
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
 --substr(p.po,1,2) in ('47','43','45') and
-r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
-dr.io = 'I' and 
+--r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
+--dr.io = 'I' and 
+ (( r.cust_customer_id in (1,9005960,576,596,575,9002717) and r.io = 'I') or (r.cust_customer_id in ( 9007901) and r.io = 'O')) and
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
 nvl(m.complete,'S') NOT IN ('H','J','F') and
 --nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
-m.io='I' and 
+m.io in ('I','O') and 
 m.movement_no <> 'OTMU1234567' and 
 m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'BRISBANE') and 
 --(dr.DELIVERYNO between 1000000 and 1999999 or
@@ -296,14 +299,15 @@ from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, s
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
 --substr(p.po,1,2) in ('47','43','45') and
-r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
-dr.io = 'I' and 
+--r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
+--dr.io = 'I' and 
+(( r.cust_customer_id in (1,9005960,576,596,575,9002717) and r.io = 'I') or (r.cust_customer_id in ( 9007901) and r.io = 'O')) and
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
 nvl(m.complete,'S') NOT IN ('H','J','F') and
  m.movement_no <> 'OTMU1234567' and 
 --nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
-m.io='I' and (
+m.io in ('I','O') and (
 m.current_location is null or
 m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc not in ( 'BRISBANE', 'MOTUKEA', 'KIUNGA','TABUBIL')) ) and 
 --(dr.DELIVERYNO between 1000000 and 1999999 or
@@ -324,7 +328,7 @@ c.customer_type = 'SUPPLIER' and
  cursor c2 is
    select count('x') tot
    from
-   (     select p.po as "Purchase Order"
+   (      select p.po as "Purchase Order"
        , p.po_item_no as "PO Item No"
        , p.grn as "GRN"
        , p.grn_item as "GRN Item"
@@ -359,20 +363,24 @@ c.customer_type = 'SUPPLIER' and
        , dr.hawb_hawbno as "Hawb Intl"
        , dr.hawb_hawbno_2 as "Hawb Local"
        , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
+   --   , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'VMR_INVENTORYNO') else null end "Material Number"
+       , case when m.urgency = 'VMR' THEN strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYNO') else null end "Material Number"
+       , case when m.urgency = 'VMR' THEN NVL(strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYDESC'), strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION')) else strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') end "Description"
    from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r
       , strang.customers c
   where p.deliveryno = dr.deliveryno and 
         p.deliveryno = r.deliveryno and 
         r.currdate >  sysdate - 720 and 
      --   substr(p.po,1,2) in ('47','43','45') and
-        r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
-        dr.io = 'I' and 
+     --   r.cust_customer_id in (1,9005960,576,596,575,9002717, 9007901) and 
+     --   dr.io in ('I','O') and 
+        (( r.cust_customer_id in (1,9005960,576,596,575,9002717) and r.io = 'I') or (r.cust_customer_id in ( 9007901) and r.io = 'O')) and
         dr.movement_no = m.movement_no and
         nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
         nvl(m.complete,'S') NOT IN ('H','J','F') and
     --    nvl(m.complete,'S') NOT IN ('H','J','D') and
        -- nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
-        m.io='I' and 
+        m.io in ('I', 'O') and 
         m.movement_no <> 'OTMU1234567' and 
         m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'TABUBIL') and 
         nvl(r.supplier_customer_id,0) = c.customer_id and 
@@ -419,17 +427,21 @@ select p.po as "Purchase Order"
        , dr.hawb_hawbno as "Hawb Intl"
        , dr.hawb_hawbno_2 as "Hawb Local"
        , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
+     --  , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'VMR_INVENTORYNO') else null end "Material Number"
+     --  , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') "Description"
+       , case when m.urgency = 'VMR' THEN strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYNO') else null end "Material Number"
+       , case when m.urgency = 'VMR' THEN NVL(strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYDESC'), strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION')) else strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') end "Description"
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
 --substr(p.po,1,2) in ('47','43','45') and
-r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
-dr.io = 'I' and 
+--r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
+--dr.io = 'I' and 
+ (( r.cust_customer_id in (1,9005960,576,596,575,9002717) and r.io = 'I') or (r.cust_customer_id in ( 9007901) and r.io = 'O')) and
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
 nvl(m.complete,'S') NOT IN ('H','J','F') and
---nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
-m.io='I' and 
+m.io in ('I','O') and 
 m.movement_no <> 'OTMU1234567' and 
 m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'KIUNGA') and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
@@ -475,17 +487,22 @@ select p.po as "Purchase Order"
        , dr.hawb_hawbno as "Hawb Intl"
        , dr.hawb_hawbno_2 as "Hawb Local"
        , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
+     --  , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'VMR_INVENTORYNO') else null end "Material Number"
+     --   , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') "Description"
+       , case when m.urgency = 'VMR' THEN strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYNO') else null end "Material Number"
+       , case when m.urgency = 'VMR' THEN NVL(strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYDESC'), strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION')) else strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') end "Description"
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 --substr(p.po,1,2) in ('47','43','45') and
 p.deliveryno = r.deliveryno and 
-r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
-dr.io = 'I' and 
+--r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
+--dr.io = 'I' and 
+ (( r.cust_customer_id in (1,9005960,576,596,575,9002717) and r.io = 'I') or (r.cust_customer_id in ( 9007901) and r.io = 'O')) and
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
 nvl(m.complete,'S') NOT IN ('H','J','F') and
 --nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
-m.io='I' and 
+m.io in ('I', 'O') and 
 m.movement_no <> 'OTMU1234567' and 
 m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'MOTUKEA') and 
 --(dr.DELIVERYNO between 1000000 and 1999999 or
@@ -493,7 +510,7 @@ m.current_location in (select code from strang.lov where lov_name='LOCATIONS' an
 --p.grn_status in (1,8,9) and 
 nvl(r.supplier_customer_id,0) = c.customer_id and 
 r.currdate >  sysdate - 720 and 
--- NVL(m.complete, 'XXXX') != 'INCOMPLETE' and
+--NVL(m.complete, 'XXXX') != 'INCOMPLETE' and
 c.customer_type = 'SUPPLIER' and 
  exists (select 1
              from  strang.detailrs dr2
@@ -534,17 +551,22 @@ select p.po as "Purchase Order"
        , dr.hawb_hawbno as "Hawb Intl"
        , dr.hawb_hawbno_2 as "Hawb Local"
        , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
+     --  , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'VMR_INVENTORYNO') else null end "Material Number"
+     --  , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') "Description"
+       , case when m.urgency = 'VMR' THEN strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYNO') else null end "Material Number"
+       , case when m.urgency = 'VMR' THEN NVL(strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYDESC'), strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION')) else strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') end "Description"
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
 --substr(p.po,1,2) in ('47','43','45') and
-r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
-dr.io = 'I' and 
+--r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
+--dr.io = 'I' and 
+ (( r.cust_customer_id in (1,9005960,576,596,575,9002717) and r.io = 'I') or (r.cust_customer_id in ( 9007901) and r.io = 'O')) and
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
 nvl(m.complete,'S') NOT IN ('H','J','F') and
 --nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
-m.io='I' and 
+m.io in ('I','O') and 
 m.movement_no <> 'OTMU1234567' and 
 m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc = 'BRISBANE') and 
 --(dr.DELIVERYNO between 1000000 and 1999999 or
@@ -595,18 +617,23 @@ select p.po as "Purchase Order"
        , dr.hawb_hawbno as "Hawb Intl"
        , dr.hawb_hawbno_2 as "Hawb Local"
        , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
+     --  , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'VMR_INVENTORYNO') else null end "Material Number"
+     --  , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') "Description"
+       , case when m.urgency = 'VMR' THEN strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYNO') else null end "Material Number"
+       , case when m.urgency = 'VMR' THEN NVL(strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYDESC'), strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION')) else strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') end "Description"
 from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
 --substr(p.po,1,2) in ('47','43','45') and
-r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
-dr.io = 'I' and 
+--r.cust_customer_id in (1,9005960,576,596,575,9002717) and 
+--dr.io = 'I' and 
+(( r.cust_customer_id in (1,9005960,576,596,575,9002717) and r.io = 'I') or (r.cust_customer_id in ( 9007901) and r.io = 'O')) and
 dr.movement_no = m.movement_no and
 nvl(dr.camov_seal, '|') = nvl(m.seal,'|') and
 nvl(m.complete,'S') NOT IN ('H','J','F') and
  m.movement_no <> 'OTMU1234567' and 
 --nvl(MOVEMENT_TYPE, 'XXX') NOT IN ('AIRWAY', 'CONMOV') and
-m.io='I' and (
+m.io in ('I','O') and (
 m.current_location is null or
 m.current_location in (select code from strang.lov where lov_name='LOCATIONS' and colc not in ( 'BRISBANE', 'MOTUKEA', 'KIUNGA','TABUBIL')) ) and 
 --(dr.DELIVERYNO between 1000000 and 1999999 or
