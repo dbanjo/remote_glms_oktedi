@@ -38,8 +38,13 @@ as
        , dr.hawb_hawbno_2 as "Hawb Local"
        , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
    --   , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'VMR_INVENTORYNO') else null end "Material Number"
-       , case when m.urgency = 'VMR' THEN strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYNO') else null end "Material Number"
+       , case when m.urgency = 'VMR' THEN strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYNO') else null end "VMR Material Number"
        , case when m.urgency = 'VMR' THEN NVL(strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYDESC'), strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION')) else strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') end "Description"
+       , p.preq_no as "STO Number"
+       , p.preq_item as "STO Item"
+       , p.inventoryno as "Material Number"
+       , p.qty as "Quantity"
+       , p.unit_unitused as "Unit of Quantity"
    from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r
       , strang.customers c
   where p.deliveryno = dr.deliveryno and 
@@ -103,8 +108,13 @@ select p.po as "Purchase Order"
        , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
      --  , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'VMR_INVENTORYNO') else null end "Material Number"
      --  , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') "Description"
-       , case when m.urgency = 'VMR' THEN strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYNO') else null end "Material Number"
+       , case when m.urgency = 'VMR' THEN strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYNO') else null end "VMR Material Number"
        , case when m.urgency = 'VMR' THEN NVL(strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYDESC'), strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION')) else strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') end "Description"
+       , p.preq_no as "STO Number"
+       , p.preq_item as "STO Item"
+       , p.inventoryno as "Material Number"
+       , p.qty as "Quantity"
+       , p.unit_unitused as "Unit of Quantity"
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
@@ -163,8 +173,13 @@ select p.po as "Purchase Order"
        , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
      --  , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'VMR_INVENTORYNO') else null end "Material Number"
      --   , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') "Description"
-       , case when m.urgency = 'VMR' THEN strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYNO') else null end "Material Number"
+       , case when m.urgency = 'VMR' THEN strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYNO') else null end "VMR Material Number"
        , case when m.urgency = 'VMR' THEN NVL(strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYDESC'), strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION')) else strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') end "Description"
+       , p.preq_no as "STO Number"
+       , p.preq_item as "STO Item"
+       , p.inventoryno as "Material Number"
+       , p.qty as "Quantity"
+       , p.unit_unitused as "Unit of Quantity"
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 --substr(p.po,1,2) in ('47','43','45') and
@@ -227,8 +242,13 @@ select p.po as "Purchase Order"
        , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
      --  , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'VMR_INVENTORYNO') else null end "Material Number"
      --  , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') "Description"
-       , case when m.urgency = 'VMR' THEN strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYNO') else null end "Material Number"
+       , case when m.urgency = 'VMR' THEN strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYNO') else null end "VMR Material Number"
        , case when m.urgency = 'VMR' THEN NVL(strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYDESC'), strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION')) else strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') end "Description"
+       , p.preq_no as "STO Number"
+       , p.preq_item as "STO Item"
+       , p.inventoryno as "Material Number"
+       , p.qty as "Quantity"
+       , p.unit_unitused as "Unit of Quantity"
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
@@ -293,8 +313,13 @@ select p.po as "Purchase Order"
        , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
      --  , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'VMR_INVENTORYNO') else null end "Material Number"
      --  , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') "Description"
-       , case when m.urgency = 'VMR' THEN strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYNO') else null end "Material Number"
+       , case when m.urgency = 'VMR' THEN strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYNO') else null end "VMR Material Number"
        , case when m.urgency = 'VMR' THEN NVL(strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYDESC'), strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION')) else strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') end "Description"
+       , p.preq_no as "STO Number"
+       , p.preq_item as "STO Item"
+       , p.inventoryno as "Material Number"
+       , p.qty as "Quantity"
+       , p.unit_unitused as "Unit of Quantity"
 from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
@@ -364,7 +389,7 @@ c.customer_type = 'SUPPLIER' and
        , dr.hawb_hawbno_2 as "Hawb Local"
        , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
    --   , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'VMR_INVENTORYNO') else null end "Material Number"
-       , case when m.urgency = 'VMR' THEN strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYNO') else null end "Material Number"
+       , case when m.urgency = 'VMR' THEN strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYNO') else null end "VMR Material Number"
        , case when m.urgency = 'VMR' THEN NVL(strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYDESC'), strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION')) else strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') end "Description"
    from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r
       , strang.customers c
@@ -429,7 +454,7 @@ select p.po as "Purchase Order"
        , to_Char(sysdate,'DD/MM/YY HH24:MI:SS') as "Post Date"  
      --  , case when m.urgency = 'VMR' THEN strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'VMR_INVENTORYNO') else null end "Material Number"
      --  , strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') "Description"
-       , case when m.urgency = 'VMR' THEN strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYNO') else null end "Material Number"
+       , case when m.urgency = 'VMR' THEN strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYNO') else null end "VMR Material Number"
        , case when m.urgency = 'VMR' THEN NVL(strang.f_get_vmr_materialno(m.movement_no,nvl(m.seal,'|'), r.deliveryno, p.po, p.po_item_no,'VMR_INVENTORYDESC'), strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION')) else strang.f_get_info(m.movement_no,nvl(m.seal,'|'),'DESCRIPTION') end "Description"
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
@@ -724,7 +749,9 @@ begin
   utl_file.put_line(f, buffer=>'"Purchase Order","PO Item No","GRN","GRN Item","Delivery No","PO Rno","Packing Status","Priority","Movement Type","Container",'||
                                '"Seal","Direction","Full Or Empty","Consignee","Consignee Location","Warehouse Destination","Current Location","Customs Cleared Date",'||
                                '"Local BOL","Intl BOL","Intl Ship Name","Intl Voyage","Intl Est Arrival Date","Local Ship Name","Local Voyage","Local Est Arrival Date",'||
-                               '"Convoy Name","Convoy Type","Convoy Depart Date","Hawb Intl","Hawb Local","Post Date","Material Number","Description"');     
+                               '"Convoy Name","Convoy Type","Convoy Depart Date","Hawb Intl","Hawb Local","Post Date","VMR Material Number",'||
+                               '"Description","STO Number","STO Item","Material Number","Quantity","Unit of Quantity"');                         
+                                
 --32
  ctr := 0;
  for c1rec in c1 loop
@@ -735,9 +762,9 @@ begin
                         || c1rec."Local BOL"||'","'|| c1rec."Intl BOL"||'","'||c1rec."Intl Ship Name"||'","'||c1rec."Intl Voyage"||'","'||c1rec."Intl Est Arrival Date"||'","'||c1rec."Local Ship Name"||'","'
                         || c1rec."Local Voyage"||'","'||c1rec."Local Est Arrival Date"||'","'
                         || c1rec."Convoy Name"||'","'||c1rec."Convoy Type"||'","'||c1rec."Convoy Depart Date"||'","'
-                        || c1rec."Hawb Intl"||'","'||c1rec."Hawb Local"||'","'||c1rec."Post Date"||'","'||c1rec."Material Number"||'","'||c1rec."Description"||'"');
+                        || c1rec."Hawb Intl"||'","'||c1rec."Hawb Local"||'","'||c1rec."Post Date"||'","'||c1rec."VMR Material Number"||'","'||c1rec."Description"||'","'
+                        || c1rec."STO Number"||'","'||c1rec."STO Item"||'","'||c1rec."Material Number"||'","'||c1rec."Quantity"||'","'||c1rec."Unit of Quantity"||'"');
 
-                        
                         
 -- ****** TURNED OFF 20180530 *********  update strang.pos set off_site_receipt = sysdate where rowid = c1rec.rowid;
 --  update strang.pos set po_waybill_type = c1rec.po_waybill_type where rowid = c1rec.rowid;
@@ -758,7 +785,8 @@ begin
   utl_file.put_line(f2, buffer=>'"Purchase Order","PO Item No","GRN","GRN Item","Delivery No","PO Rno","Packing Status","Priority","Movement Type","Container",'||
                                '"Seal","Direction","Full Or Empty","Consignee","Consignee Location","Warehouse Destination","Current Location","Customs Cleared Date",'||
                                '"Local BOL","Intl BOL","Intl Ship Name","Intl Voyage","Intl Est Arrival Date","Local Ship Name","Local Voyage","Local Est Arrival Date",'||
-                               '"Convoy Name","Convoy Type","Convoy Depart Date","Hawb Intl","Hawb Local","Post Date","Material Number","Description"');     
+                               '"Convoy Name","Convoy Type","Convoy Depart Date","Hawb Intl","Hawb Local","Post Date","VMR Material Number",'||
+                               '"Description","STO Number","STO Item","Material Number","Quantity","Unit of Quantity"');       
   
 
   ctr1 := 0;
@@ -777,7 +805,8 @@ begin
                         || c1rec."Local BOL"||'","'|| c1rec."Intl BOL"||'","'||c1rec."Intl Ship Name"||'","'||c1rec."Intl Voyage"||'","'||c1rec."Intl Est Arrival Date"||'","'||c1rec."Local Ship Name"||'","'
                         || c1rec."Local Voyage"||'","'||c1rec."Local Est Arrival Date"||'","'
                         || c1rec."Convoy Name"||'","'||c1rec."Convoy Type"||'","'||c1rec."Convoy Depart Date"||'","'
-                        ||c1rec."Hawb Intl"||'","'||c1rec."Hawb Local"||'","'||c1rec."Post Date"||'","'||c1rec."Material Number"||'","'||c1rec."Description"||'"');
+                        || c1rec."Hawb Intl"||'","'||c1rec."Hawb Local"||'","'||c1rec."Post Date"||'","'||c1rec."VMR Material Number"||'","'||c1rec."Description"||'","'
+                        || c1rec."STO Number"||'","'||c1rec."STO Item"||'","'||c1rec."Material Number"||'","'||c1rec."Quantity"||'","'||c1rec."Unit of Quantity"||'"');
   
               
    
