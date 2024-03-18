@@ -20244,8 +20244,7 @@ begin
                                                and  l.colj = 'VMR')
                                  )
                  );
-
-
+  
  ------------------------------------------------------------------------------------------------------------------------------------------------------- 
    update strang.movements m
       set sumweight = (select sum(nvl(di.WEIGHT,0))
@@ -20804,7 +20803,7 @@ begin
  elsif typ in ( 'CONTROLS','CONTRACTS','GSTCODES' )
   then
    if seclevel in ('LEVEL 3', 'LEVEL 4', 'LEVEL 5', 'LEVEL 6' ) then return( 'READ' ); else return( 'NONE' ); end if;
- elsif typ in ('TARIFF','INVENT','AU_TARIFF')
+ elsif typ in ('TARIFF','INVENT')
   then
    if seclevel in (  'LEVEL 1','LEVEL 6' ) then return( 'READ' ); elsif seclevel in ('LEVEL 3','LEVEL 4','LEVEL 5', 'LEVEL 8' ) then return( 'EDIT' ); else return( 'NONE' ); end if;
  elsif typ in ('SAD')
