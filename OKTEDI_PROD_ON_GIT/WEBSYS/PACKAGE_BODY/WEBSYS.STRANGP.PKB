@@ -20244,7 +20244,8 @@ begin
                                                and  l.colj = 'VMR')
                                  )
                  );
-  
+
+
  ------------------------------------------------------------------------------------------------------------------------------------------------------- 
    update strang.movements m
       set sumweight = (select sum(nvl(di.WEIGHT,0))
@@ -20803,7 +20804,7 @@ begin
  elsif typ in ( 'CONTROLS','CONTRACTS','GSTCODES' )
   then
    if seclevel in ('LEVEL 3', 'LEVEL 4', 'LEVEL 5', 'LEVEL 6' ) then return( 'READ' ); else return( 'NONE' ); end if;
- elsif typ in ('TARIFF','INVENT')
+ elsif typ in ('TARIFF','INVENT','AU_TARIFF')
   then
    if seclevel in (  'LEVEL 1','LEVEL 6' ) then return( 'READ' ); elsif seclevel in ('LEVEL 3','LEVEL 4','LEVEL 5', 'LEVEL 8' ) then return( 'EDIT' ); else return( 'NONE' ); end if;
  elsif typ in ('SAD')
@@ -36282,7 +36283,7 @@ cursor c8( sname varchar2 ) is select screen_id from oltp_overview where screen_
 
  begin
 
- glbx.cookie_id( surl,stype, ltype, owner_id, sts, progcalled=>'STRANGP.DETAIL_ITEMS' );
+ glbx.cookie_id( surl,stype, ltype, owner_id, sts, progcalled=>'STRANGP.DETAIL_ITEMS_ACCEPT' );
  if sts is not null
   then
   glbx.redisplay_login_page( sts, TRUE );
@@ -36787,10 +36788,10 @@ end check_file_name;
 
 begin
 
- glbx.cookie_id( surl,stype, ltype, owner_id, sts, progcalled=>'STRANGP.DETAIL_ITEMS' );
+ glbx.cookie_id( surl,stype, ltype, owner_id, sts, progcalled=>'STRANGP.LOAD_FILES_ACCEPT' );
  if sts is not null
   then
-  glbx.redisplay_login_page( sts, TRUE );
+  glbx.redisplay_login_page( sts, TRUE );   
   return;
  end if;
 
