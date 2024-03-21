@@ -1,6 +1,6 @@
 CREATE OR REPLACE procedure WEBSYS.generate_shipped_pos( surl in varchar2, vtoday in date, is_batch in varchar2 default 'FALSE' )
 as
--- another test comment.
+-- This is a push test 21/3/2024
  cursor c1 is
   select p.po as "Purchase Order"
        , p.po_item_no as "PO Item No"
