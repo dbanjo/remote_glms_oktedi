@@ -43,8 +43,8 @@ as
        , p.preq_no as "STO Number"
        , p.preq_item as "STO Item"
        , p.inventoryno as "Material Number"
-       , p.qty as "Quantity"
-       , p.unit_unitused as "Unit of Quantity"
+       , p.sap_delno_qty as "Quantity"
+       , p.sap_delno_unit as "Unit of Quantity"
    from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r
       , strang.customers c
   where p.deliveryno = dr.deliveryno and 
@@ -113,8 +113,10 @@ select p.po as "Purchase Order"
        , p.preq_no as "STO Number"
        , p.preq_item as "STO Item"
        , p.inventoryno as "Material Number"
-       , p.qty as "Quantity"
-       , p.unit_unitused as "Unit of Quantity"
+       , p.sap_delno_qty as "Quantity"
+       , p.sap_delno_unit as "Unit of Quantity"
+--       , p.qty as "Quantity"
+--       , p.unit_unitused as "Unit of Quantity"
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
@@ -178,8 +180,10 @@ select p.po as "Purchase Order"
        , p.preq_no as "STO Number"
        , p.preq_item as "STO Item"
        , p.inventoryno as "Material Number"
-       , p.qty as "Quantity"
-       , p.unit_unitused as "Unit of Quantity"
+       , p.sap_delno_qty as "Quantity"
+       , p.sap_delno_unit as "Unit of Quantity"
+--       , p.qty as "Quantity"
+--       , p.unit_unitused as "Unit of Quantity"
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 --substr(p.po,1,2) in ('47','43','45') and
@@ -247,8 +251,10 @@ select p.po as "Purchase Order"
        , p.preq_no as "STO Number"
        , p.preq_item as "STO Item"
        , p.inventoryno as "Material Number"
-       , p.qty as "Quantity"
-       , p.unit_unitused as "Unit of Quantity"
+       , p.sap_delno_qty as "Quantity"
+       , p.sap_delno_unit as "Unit of Quantity"
+--       , p.qty as "Quantity"
+--       , p.unit_unitused as "Unit of Quantity"
  from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
@@ -318,8 +324,10 @@ select p.po as "Purchase Order"
        , p.preq_no as "STO Number"
        , p.preq_item as "STO Item"
        , p.inventoryno as "Material Number"
-       , p.qty as "Quantity"
-       , p.unit_unitused as "Unit of Quantity"
+       , p.sap_delno_qty as "Quantity"
+       , p.sap_delno_unit as "Unit of Quantity"
+--       , p.qty as "Quantity"
+--       , p.unit_unitused as "Unit of Quantity"
 from strang.movements m, strang.pos p, strang.detailrs dr, strang.receivals r, strang.customers c 
 where p.deliveryno = dr.deliveryno and 
 p.deliveryno = r.deliveryno and 
