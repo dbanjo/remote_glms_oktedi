@@ -154,9 +154,7 @@ as
          ((xtr_a is null) or (xtr_a is not null and cola = xtr_a) ) and
          ((xtr_b is null) or (xtr_b is not null and colb = xtr_b) )
    order by decode(snd,'A',code,'B',description);
-   
-   
-
+  
   cursor c2( cd varchar2, xtr_a varchar2, xtr_b varchar2 ) is
    select *
    from strang.lov
@@ -729,6 +727,7 @@ begin
      then
       htp.tabledata( 'Package Group', cattributes=>glbx.QUERY_BACKGROUND || 'valign="CENTER" align="CENTER"' );
       htp.tabledata( 'Weight (kg)', cattributes=>glbx.QUERY_BACKGROUND || 'valign="CENTER" align="CENTER"' );
+      htp.tabledata( 'Filter', cattributes=>glbx.QUERY_BACKGROUND || 'valign="CENTER" align="CENTER"' );
     end if;
 
     -- Cola
@@ -1024,7 +1023,7 @@ begin
 -- Colb
       if parm in ('CTRTYPE','TARIFF','AU_TARIFF','GSTCODES','LOCATIONS','PACKTYPES',
                   'UNCUOTAB','UNDECTAB','UNMODTAB','UNCMPTAB','UNCAPTAB','UNSHDTAB','UNBNKTAB',
-                  'UNBRATAB','UNWHSTAB','UNRATTAB','UNTARTAB','UNPRFTAB','UNCP4TAB','UNCP3TAB','OPERATORS','TRAILERS'
+                  'UNBRATAB','UNWHSTAB','UNRATTAB','UNTARTAB','UNPRFTAB','UNCP4TAB','UNCP3TAB','OPERATORS','TRAILERS','SMP_PACKTYPES'
                   )
        then
         if parm = 'GSTCODES'
